@@ -227,37 +227,6 @@
    have the nap function.  */
 #define HAVE_HUNDREDTHS_NAP 0
 
-/* Set PS_PROGRAM to the program to run to get a process status,
-   including the arguments to pass it.  This is used by ``uustat -p''.
-   Set HAVE_PS_MULTIPLE to 1 if a comma separated list of process
-   numbers may be appended (e.g. ``ps -flp1,10,100'').  Otherwise ps
-   will be invoked several times, with a single process number append
-   each time.  The default definitions should work on most systems,
-   although some (such as the NeXT) will complain about the 'p'
-   option; for those, use the second set of definitions.  The third
-   set of definitions are appropriate for System V.  To use the second
-   or third set of definitions, change the ``#if 1'' to ``#if 0'' and
-   change the appropriate ``#if 0'' to ``#if 1''.  */
-#if 1
-#define PS_PROGRAM "/bin/ps -lp"
-#define HAVE_PS_MULTIPLE 0
-#endif
-#if 0
-#define PS_PROGRAM "/bin/ps -l"
-#define HAVE_PS_MULTIPLE 0
-#endif
-#if 0
-#define PS_PROGRAM "/bin/ps -flp"
-#define HAVE_PS_MULTIPLE 1
-#endif
-#ifdef __QNX__
-/* Use this for QNX, along with HAVE_QNX_LOCKFILES.  */
-#undef PS_PROGRAM
-#undef HAVE_PS_MULTIPLE
-#define PS_PROGRAM "/bin/ps -l -n -p"
-#define HAVE_PS_MULTIPLE 0
-#endif
-
 /* If you use other programs that also lock devices, such as cu or
    uugetty, the other programs and UUCP must agree on whether a device
    is locked.  This is typically done by creating a lock file in a
