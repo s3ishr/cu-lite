@@ -117,31 +117,31 @@ struct sconncmds
   boolean (*pfunlock) P((struct sconnection *qconn));
   /* Open the connection.  */
   boolean (*pfopen) P((struct sconnection *qconn, long ibaud,
-		       boolean fwait, boolean fuser));
+                       boolean fwait, boolean fuser));
   /* Close the connection.  */
   boolean (*pfclose) P((struct sconnection *qconn,
-			pointer puuconf,
-			struct uuconf_dialer *qdialer,
-			boolean fsuccess));
+                        pointer puuconf,
+                        struct uuconf_dialer *qdialer,
+                        boolean fsuccess));
   /* Dial a number on a connection.  This set *qdialer to the dialer
      used, if any, and sets *ptdialerfound appropriately.  The qsys
      and zphone arguments are for the chat script.  This field may be
      NULL.  */
   boolean (*pfdial) P((struct sconnection *qconn, pointer puuconf,
-		       const struct uuconf_system *qsys,
-		       const char *zphone,
-		       struct uuconf_dialer *qdialer,
-		       enum tdialerfound *ptdialerfound));
+                       const struct uuconf_system *qsys,
+                       const char *zphone,
+                       struct uuconf_dialer *qdialer,
+                       enum tdialerfound *ptdialerfound));
   /* Read data from a connection, with a timeout in seconds.  When
      called *pclen is the length of the buffer; on successful return
      *pclen is the number of bytes read into the buffer.  The cmin
      argument is the minimum number of bytes to read before returning
      ahead of a timeout.  */
   boolean (*pfread) P((struct sconnection *qconn, char *zbuf, size_t *pclen,
-		       size_t cmin, int ctimeout, boolean freport));
+                       size_t cmin, int ctimeout, boolean freport));
   /* Write data to the connection.  */
   boolean (*pfwrite) P((struct sconnection *qconn, const char *zbuf,
-			size_t clen));
+                        size_t clen));
   /* Read and write data to the connection.  This reads and writes
      data until either all passed in data has been written or the read
      buffer has been filled.  When called *pcread is the size of the
@@ -149,17 +149,17 @@ struct sconncmds
      successful return *pcread is the number of bytes read and
      *pcwrite is the number of bytes written.  */
   boolean (*pfio) P((struct sconnection *qconn, const char *zwrite,
-		     size_t *pcwrite, char *zread, size_t *pcread));
+                     size_t *pcwrite, char *zread, size_t *pcread));
   /* Send a break character.  This field may be NULL.  */
   boolean (*pfbreak) P((struct sconnection *qconn));
   /* Change the connection setting.  This field may be NULL.  */
   boolean (*pfset) P((struct sconnection *qconn,
-		      enum tparitysetting tparity,
-		      enum tstripsetting tstrip,
-		      enum txonxoffsetting txonxoff));
+                      enum tparitysetting tparity,
+                      enum tstripsetting tstrip,
+                      enum txonxoffsetting txonxoff));
   /* Require or ignore carrer.  This field may be NULL.  */
   boolean (*pfcarrier) P((struct sconnection *qconn,
-			  boolean fcarrier));
+                          boolean fcarrier));
   /* Run a chat program on a connection.  */
   boolean (*pfchat) P((struct sconnection *qconn, char **pzprog));
   /* Get the baud rate of a connection.  This field may be NULL.  */
@@ -173,8 +173,8 @@ struct sconncmds
    of qconn.  If qport is NULL, this opens standard input as a port
    using type ttype.  This function returns FALSE on error.  */
 extern boolean fconn_init P((struct uuconf_port *qport,
-			     struct sconnection *qconn,
-			     enum uuconf_porttype ttype));
+                             struct sconnection *qconn,
+                             enum uuconf_porttype ttype));
 
 /* Free up connection data.  */
 extern void uconn_free P((struct sconnection *qconn));
@@ -185,7 +185,7 @@ extern void uconn_free P((struct sconnection *qconn));
    is TRUE if, should the port be opened, it should be opened using
    the user's permissions rather than the effective permissions.  */
 extern boolean fconn_lock P((struct sconnection *qconn, boolean fin,
-			     boolean fuser));
+                             boolean fuser));
 
 /* Unlock a connection.  */
 extern boolean fconn_unlock P((struct sconnection *qconn));
@@ -197,25 +197,25 @@ extern boolean fconn_unlock P((struct sconnection *qconn));
    the device should be opened using the user's permissions rather
    than the effective permissions.  */
 extern boolean fconn_open P((struct sconnection *qconn, long ibaud,
-			     long ihighbaud, boolean fwait,
-			     boolean fuser));
+                             long ihighbaud, boolean fwait,
+                             boolean fuser));
 
 /* Close a connection.  The fsuccess argument is TRUE if the
    conversation completed normally, FALSE if it is being aborted.  */
 extern boolean fconn_close P((struct sconnection *qconn,
-			      pointer puuconf,
-			      struct uuconf_dialer *qdialer,
-			      boolean fsuccess));
+                              pointer puuconf,
+                              struct uuconf_dialer *qdialer,
+                              boolean fsuccess));
 
 /* Dial out on a connection.  The qsys and zphone arguments are for
    the chat scripts; zphone is the phone number to dial.  If qdialer
    is not NULL, *qdialer will be set to the dialer information used if
    any; *ptdialerfound will be set appropriately.  */
 extern boolean fconn_dial P((struct sconnection *q, pointer puuconf,
-			     const struct uuconf_system *qsys,
-			     const char *zphone,
-			     struct uuconf_dialer *qdialer,
-			     enum tdialerfound *ptdialerfound));
+                             const struct uuconf_system *qsys,
+                             const char *zphone,
+                             struct uuconf_dialer *qdialer,
+                             enum tdialerfound *ptdialerfound));
 
 /* Read from a connection.
    zbuf -- buffer to read bytes into
@@ -225,12 +225,12 @@ extern boolean fconn_dial P((struct sconnection *q, pointer puuconf,
    ctimeout -- timeout in seconds, 0 if none
    freport -- whether to report errors.  */
 extern boolean fconn_read P((struct sconnection *qconn, char *zbuf,
-			     size_t *pclen, size_t cmin,
-			     int ctimeout, boolean freport));
+                             size_t *pclen, size_t cmin,
+                             int ctimeout, boolean freport));
 
 /* Write to a connection.  */
 extern boolean fconn_write P((struct sconnection *qconn, const char *zbuf,
-			      size_t cbytes));
+                              size_t cbytes));
 
 /* Read and write to a connection.  This reads and writes data until
    either all passed-in data has been written or the read buffer is
@@ -242,7 +242,7 @@ extern boolean fconn_write P((struct sconnection *qconn, const char *zbuf,
    *pcread on call -- size of read buffer
    *pcread on successful return -- number of bytes read.  */
 extern boolean fconn_io P((struct sconnection *qconn, const char *zwrite,
-			   size_t *pcwrite, char *zread, size_t *pcread));
+                           size_t *pcwrite, char *zread, size_t *pcread));
 
 /* Send a break character to a connection.  */
 extern boolean fconn_break P((struct sconnection *qconn));
@@ -254,54 +254,54 @@ extern boolean fconn_break P((struct sconnection *qconn));
    function returns FALSE on error.  Attempts to set values not
    supported by the hardware are silently ignored.  */
 extern boolean fconn_set P((struct sconnection *qconn,
-			    enum tparitysetting tparity,
-			    enum tstripsetting tstrip,
-			    enum txonxoffsetting txonxoff));
+                            enum tparitysetting tparity,
+                            enum tstripsetting tstrip,
+                            enum txonxoffsetting txonxoff));
 
 /* Get the baud rate of a connection.  */
 extern long iconn_baud P((struct sconnection *qconn));
 
 /* Do a chat script with a system.  */
 extern boolean fchat P((struct sconnection *qconn, pointer puuconf,
-			const struct uuconf_chat *qchat,
-			const struct uuconf_system *qsys,
-			const struct uuconf_dialer *qdialer,
-			const char *zphone, boolean ftranslate,
-			const char *zport, long ibaud));
+                        const struct uuconf_chat *qchat,
+                        const struct uuconf_system *qsys,
+                        const struct uuconf_dialer *qdialer,
+                        const char *zphone, boolean ftranslate,
+                        const char *zport, long ibaud));
 
 /* Tell the connection to either require or ignore carrier as fcarrier
    is TRUE or FALSE respectively.  This is called with fcarrier TRUE
    when \m is encountered in a chat script, and with fcarrier FALSE
    when \M is encountered.  */
 extern boolean fconn_carrier P((struct sconnection *qconn,
-				boolean fcarrier));
+                                boolean fcarrier));
 
 /* Run a chat program on a connection.  */
 extern boolean fconn_run_chat P((struct sconnection *qconn,
-				 char **pzprog));
+                                 char **pzprog));
 
 /* Run through a dialer sequence.  This is a support routine for the
    port type specific dialing routines.  */
 extern boolean fconn_dial_sequence P((struct sconnection *qconn,
-				      pointer puuconf, char **pzdialer,
-				      const struct uuconf_system *qsys,
-				      const char *zphone,
-				      struct uuconf_dialer *qdialer,
-				      enum tdialerfound *ptdialerfound));
+                                      pointer puuconf, char **pzdialer,
+                                      const struct uuconf_system *qsys,
+                                      const char *zphone,
+                                      struct uuconf_dialer *qdialer,
+                                      enum tdialerfound *ptdialerfound));
 
 /* Dialing out on a modem is partially system independent.  This is
    the modem dialing routine.  */
 extern boolean fmodem_dial P((struct sconnection *qconn, pointer puuconf,
-			      const struct uuconf_system *qsys,
-			      const char *zphone,
-			      struct uuconf_dialer *qdialer,
-			      enum tdialerfound *ptdialerfound));
+                              const struct uuconf_system *qsys,
+                              const char *zphone,
+                              struct uuconf_dialer *qdialer,
+                              enum tdialerfound *ptdialerfound));
 
 /* Begin dialing out.  This should open the dialer device if there is
    one, toggle DTR if requested and possible, and tell the port to
    ignore carrier.  It should return FALSE on error.  */
 extern boolean fsysdep_modem_begin_dial P((struct sconnection *qconn,
-					   struct uuconf_dialer *qdial));
+                                           struct uuconf_dialer *qdial));
 
 /* Finish dialing out on a modem.  This should close the dialer device
    if there is one.  If the dialer and the port both support carrier,
@@ -310,7 +310,7 @@ extern boolean fsysdep_modem_begin_dial P((struct sconnection *qconn,
    port both the port support carrier, it should wait until carrier
    comes on.  */
 extern boolean fsysdep_modem_end_dial P((struct sconnection *qconn,
-					 struct uuconf_dialer *qdial));
+                                         struct uuconf_dialer *qdial));
 
 /* System dependent initialization routines.  */
 extern boolean fsysdep_stdin_init P((struct sconnection *qconn));

@@ -193,18 +193,18 @@ static void uculog_start P((void));
 static void uculog_end P((void));
 static int icuport_lock P((struct uuconf_port *qport, pointer pinfo));
 static boolean fcudo_cmd P((pointer puuconf, struct sconnection *qconn,
-			    int bcmd));
+                            int bcmd));
 static boolean fcuset_var P((pointer puuconf, char *zline));
 static int icuunrecogvar P((pointer puuconf, int argc, char **argv,
-			    pointer pvar, pointer pinfo));
+                            pointer pvar, pointer pinfo));
 static int icuunrecogfn P((pointer puuconf, int argc, char **argv,
-			   pointer pvar, pointer pinfo));
+                           pointer pvar, pointer pinfo));
 static void uculist_vars P((void));
 static void uculist_fns P((const char *zescape));
 static boolean fcudo_subcmd P((pointer puuconf, struct sconnection *qconn,
-			       char *zline));
+                               char *zline));
 static boolean fcusend_buf P((struct sconnection *qconn, const char *zbuf,
-			      size_t cbuf));
+                              size_t cbuf));
 
 #define ucuputs(zline) \
        do { if (! fsysdep_terminal_puts (zline)) ucuabort (); } while (0)
@@ -281,148 +281,148 @@ main (argc, argv)
   for (i = 1; i < argc; i++)
     {
       if (argv[i][0] == '-'
-	  && isdigit (BUCHAR (argv[i][1])))
-	{
-	  size_t clen;
-	  char *z;
+          && isdigit (BUCHAR (argv[i][1])))
+        {
+          size_t clen;
+          char *z;
 
-	  clen = strlen (argv[i]);
-	  z = zbufalc (clen + 2);
-	  z[0] = '-';
-	  z[1] = 's';
-	  memcpy (z + 2, argv[i] + 1, clen);
- 	  argv[i] = z;
-	}
+          clen = strlen (argv[i]);
+          z = zbufalc (clen + 2);
+          z[0] = '-';
+          z[1] = 's';
+          memcpy (z + 2, argv[i] + 1, clen);
+          argv[i] = z;
+        }
     }
 
   while ((iopt = getopt_long (argc, argv, "a:c:deE:hnI:l:op:s:tvx:z:",
-			      asCulongopts, (int *) NULL)) != EOF)
+                              asCulongopts, (int *) NULL)) != EOF)
     {
       switch (iopt)
-	{
-	case 'c':
-	  /* Phone number.  */
-	  zphone = optarg;
-	  break;
+        {
+        case 'c':
+          /* Phone number.  */
+          zphone = optarg;
+          break;
 
-	case 'd':
-	  /* Set debugging level to maximum.  */
+        case 'd':
+          /* Set debugging level to maximum.  */
 #if DEBUG > 1
-	  iDebug = DEBUG_MAX;
+          iDebug = DEBUG_MAX;
 #endif
-	  break;
+          break;
 
-	case 'e':
-	  /* Even parity.  */
-	  feven = TRUE;
-	  break;
+        case 'e':
+          /* Even parity.  */
+          feven = TRUE;
+          break;
 
-	case 'E':
-	  /* Escape character.  */
-	  zCuvar_escape = optarg;
-	  break;
+        case 'E':
+          /* Escape character.  */
+          zCuvar_escape = optarg;
+          break;
 
-	case 'h':
-	  /* Local echo.  */
-	  fCulocalecho = TRUE;
-	  break;
+        case 'h':
+          /* Local echo.  */
+          fCulocalecho = TRUE;
+          break;
 
-	case 'n':
-	  /* Prompt for phone number.  */
-	  fprompt = TRUE;
-	  break;
+        case 'n':
+          /* Prompt for phone number.  */
+          fprompt = TRUE;
+          break;
 
-	case 'l':
-	  /* Line name.  */
-	  zline = optarg;
-	  break;
+        case 'l':
+          /* Line name.  */
+          zline = optarg;
+          break;
 
-	case 'o':
-	  /* Odd parity.  */
-	  fodd = TRUE;
-	  break;
+        case 'o':
+          /* Odd parity.  */
+          fodd = TRUE;
+          break;
 
-	case 'p':
-	case 'a':
-	  /* Port name (-a is for compatibility).  */
-	  zport = optarg;
-	  break;
+        case 'p':
+        case 'a':
+          /* Port name (-a is for compatibility).  */
+          zport = optarg;
+          break;
 
-	case 's':
-	  /* Speed.  */
-	  ibaud = strtol (optarg, (char **) NULL, 10);
-	  break;
+        case 's':
+          /* Speed.  */
+          ibaud = strtol (optarg, (char **) NULL, 10);
+          break;
 
-	case 't':
-	  /* Map cr to crlf.  */
-	  fmapcr = TRUE;
-	  break;
+        case 't':
+          /* Map cr to crlf.  */
+          fmapcr = TRUE;
+          break;
 
-	case 'z':
-	  /* System name.  */
-	  zsystem = optarg;
-	  break;
+        case 'z':
+          /* System name.  */
+          zsystem = optarg;
+          break;
 
-	case 'I':
-	  /* Configuration file name.  */
-	  if (fsysdep_other_config (optarg))
-	    zconfig = optarg;
-	  break;
+        case 'I':
+          /* Configuration file name.  */
+          if (fsysdep_other_config (optarg))
+            zconfig = optarg;
+          break;
 
-	case 'x':
+        case 'x':
 #if DEBUG > 1
-	  /* Set debugging level.  */
-	  iDebug |= idebug_parse (optarg);
+          /* Set debugging level.  */
+          iDebug |= idebug_parse (optarg);
 #endif
-	  break;
+          break;
 
-	case 'v':
-	  /* Print version and exit.  */
-	  printf ("cu (Taylor UUCP) %s\n", VERSION);
-	  printf ("Copyright (C) 1991, 92, 93, 94, 1995, 2002 Ian Lance Taylor\n");
-	  printf ("This program is free software; you may redistribute it under the terms of\n");
-	  printf ("the GNU General Public LIcense.  This program has ABSOLUTELY NO WARRANTY.\n");
-	  exit (EXIT_SUCCESS);
-	  /*NOTREACHED*/
+        case 'v':
+          /* Print version and exit.  */
+          printf ("cu (Taylor UUCP) %s\n", VERSION);
+          printf ("Copyright (C) 1991, 92, 93, 94, 1995, 2002 Ian Lance Taylor\n");
+          printf ("This program is free software; you may redistribute it under the terms of\n");
+          printf ("the GNU General Public LIcense.  This program has ABSOLUTELY NO WARRANTY.\n");
+          exit (EXIT_SUCCESS);
+          /*NOTREACHED*/
 
-	case 2:
-	  /* --parity.  */
-	  if (strncmp (optarg, "even", strlen (optarg)) == 0)
-	    feven = TRUE;
-	  else if (strncmp (optarg, "odd", strlen (optarg)) == 0)
-	    fodd = TRUE;
-	  else if (strncmp (optarg, "none", strlen (optarg)) == 0)
-	    {
-	      feven = TRUE;
-	      fodd = TRUE;
-	    }
-	  else
-	    {
-	      fprintf (stderr, "%s: --parity requires even, odd or none\n",
-		       zProgram);
-	      ucuusage ();
-	    }
-	  break;
+        case 2:
+          /* --parity.  */
+          if (strncmp (optarg, "even", strlen (optarg)) == 0)
+            feven = TRUE;
+          else if (strncmp (optarg, "odd", strlen (optarg)) == 0)
+            fodd = TRUE;
+          else if (strncmp (optarg, "none", strlen (optarg)) == 0)
+            {
+              feven = TRUE;
+              fodd = TRUE;
+            }
+          else
+            {
+              fprintf (stderr, "%s: --parity requires even, odd or none\n",
+                       zProgram);
+              ucuusage ();
+            }
+          break;
 
-	case 3:
-	  /* --nostop.  */
-	  txonxoff = XONXOFF_OFF;
-	  break;
+        case 3:
+          /* --nostop.  */
+          txonxoff = XONXOFF_OFF;
+          break;
 
-	case 1:
-	  /* --help.  */
-	  ucuhelp ();
-	  exit (EXIT_SUCCESS);
-	  /*NOTREACHED*/
+        case 1:
+          /* --help.  */
+          ucuhelp ();
+          exit (EXIT_SUCCESS);
+          /*NOTREACHED*/
 
-	case 0:
-	  /* Long option found and flag set.  */
-	  break;
+        case 0:
+          /* Long option found and flag set.  */
+          break;
 
-	default:
-	  ucuusage ();
-	  /*NOTREACHED*/
-	}
+        default:
+          ucuusage ();
+          /*NOTREACHED*/
+        }
     }
 
   /* There can be one more argument, which is either a system name, a
@@ -432,19 +432,19 @@ main (argc, argv)
   if (optind != argc)
     {
       if (optind != argc - 1
-	  || zsystem != NULL
-	  || zphone != NULL)
-	{
-	  fprintf (stderr, "%s: too many arguments\n", zProgram);
-	  ucuusage ();
-	}
+          || zsystem != NULL
+          || zphone != NULL)
+        {
+          fprintf (stderr, "%s: too many arguments\n", zProgram);
+          ucuusage ();
+        }
       if (strcmp (argv[optind], "dir") != 0)
-	{
-	  if (isdigit (BUCHAR (argv[optind][0])))
-	    zphone = argv[optind];
-	  else
-	    zsystem = argv[optind];
-	}
+        {
+          if (isdigit (BUCHAR (argv[optind][0])))
+            zphone = argv[optind];
+          else
+            zsystem = argv[optind];
+        }
     }
 
   /* If the user doesn't give a system, port, line or speed, then
@@ -455,7 +455,7 @@ main (argc, argv)
       && ibaud == 0L)
     {
       fprintf (stderr, "%s: must specify system, line, port or speed\n",
-	       zProgram);
+               zProgram);
       ucuusage ();
     }
 
@@ -468,11 +468,11 @@ main (argc, argv)
       zphone = NULL;
       cphone = 0;
       if (getline (&zphone, &cphone, stdin) <= 0
-	  || *zphone == '\0')
-	{
-	  fprintf (stderr, "%s: no phone number entered\n", zProgram);
-	  exit (EXIT_FAILURE);
-	}
+          || *zphone == '\0')
+        {
+          fprintf (stderr, "%s: no phone number entered\n", zProgram);
+          exit (EXIT_FAILURE);
+        }
     }
 
   iuuconf = uuconf_init (&puuconf, "cu", zconfig);
@@ -499,7 +499,7 @@ main (argc, argv)
     {
       zlocalname = zsysdep_localname ();
       if (zlocalname == NULL)
-	exit (EXIT_FAILURE);
+        exit (EXIT_FAILURE);
     }
   else if (iuuconf != UUCONF_SUCCESS)
     ulog_uuconf (LOG_FATAL, puuconf, iuuconf);
@@ -528,11 +528,11 @@ main (argc, argv)
     {
       iuuconf = uuconf_system_info (puuconf, zsystem, &ssys);
       if (iuuconf != UUCONF_SUCCESS)
-	{
-	  if (iuuconf != UUCONF_NOT_FOUND)
-	    ulog_uuconf (LOG_FATAL, puuconf, iuuconf);
-	  ulog (LOG_FATAL, "%s: System not found", zsystem);
-	}
+        {
+          if (iuuconf != UUCONF_NOT_FOUND)
+            ulog_uuconf (LOG_FATAL, puuconf, iuuconf);
+          ulog (LOG_FATAL, "%s: System not found", zsystem);
+        }
       qsys = &ssys;
     }
 
@@ -548,221 +548,221 @@ main (argc, argv)
       long iusebaud;
 
       /* The uuconf_find_port function only selects directly on a port
-	 name and a speed.  To select based on the line name, we use a
-	 function.  If we can't find any defined port, and the user
-	 specified a line name but did not specify a port name or a
-	 system or a phone number, then we fake a direct port with
-	 that line name (we don't fake a port if a system or phone
-	 number were given because if we fake a port we have no way to
-	 place a call; perhaps we should automatically look up a
-	 particular dialer).  This permits users to say cu -lttyd0
-	 without having to put ttyd0 in the ports file, provided they
-	 have read and write access to the port.  */
+         name and a speed.  To select based on the line name, we use a
+         function.  If we can't find any defined port, and the user
+         specified a line name but did not specify a port name or a
+         system or a phone number, then we fake a direct port with
+         that line name (we don't fake a port if a system or phone
+         number were given because if we fake a port we have no way to
+         place a call; perhaps we should automatically look up a
+         particular dialer).  This permits users to say cu -lttyd0
+         without having to put ttyd0 in the ports file, provided they
+         have read and write access to the port.  */
       sinfo.fmatched = FALSE;
       sinfo.flocked = FALSE;
       sinfo.fdirect = qsys == NULL && zphone == NULL;
       sinfo.qconn = &sconn;
       sinfo.zline = zline;
       if (zport != NULL || zline != NULL || ibaud != 0L)
-	{
-	  iuuconf = uuconf_find_port (puuconf, zport, ibaud, 0L,
-				      icuport_lock, (pointer) &sinfo,
-				      &sport);
-	  if (iuuconf != UUCONF_SUCCESS)
-	    {
-	      if (iuuconf != UUCONF_NOT_FOUND)
-		{
-		  if (sinfo.flocked)
-		    {
-		      (void) fconn_unlock (&sconn);
-		      uconn_free (&sconn);
-		    }
-		  ulog_uuconf (LOG_FATAL, puuconf, iuuconf);
-		}
-	      if (zline == NULL
-		  || zport != NULL
-		  || zphone != NULL
-		  || qsys != NULL)
-		{
-		  if (sinfo.fmatched)
-		    ulog (LOG_FATAL, "All matching ports in use");
-		  else
-		    ulog (LOG_FATAL, "No matching ports");
-		}
+        {
+          iuuconf = uuconf_find_port (puuconf, zport, ibaud, 0L,
+                                      icuport_lock, (pointer) &sinfo,
+                                      &sport);
+          if (iuuconf != UUCONF_SUCCESS)
+            {
+              if (iuuconf != UUCONF_NOT_FOUND)
+                {
+                  if (sinfo.flocked)
+                    {
+                      (void) fconn_unlock (&sconn);
+                      uconn_free (&sconn);
+                    }
+                  ulog_uuconf (LOG_FATAL, puuconf, iuuconf);
+                }
+              if (zline == NULL
+                  || zport != NULL
+                  || zphone != NULL
+                  || qsys != NULL)
+                {
+                  if (sinfo.fmatched)
+                    ulog (LOG_FATAL, "All matching ports in use");
+                  else
+                    ulog (LOG_FATAL, "No matching ports");
+                }
 
-	      sport.uuconf_zname = zline;
-	      sport.uuconf_ttype = UUCONF_PORTTYPE_DIRECT;
-	      sport.uuconf_zprotocols = NULL;
-	      sport.uuconf_qproto_params = NULL;
-	      sport.uuconf_ireliable = 0;
-	      sport.uuconf_zlockname = NULL;
-	      sport.uuconf_palloc = NULL;
-	      sport.uuconf_u.uuconf_sdirect.uuconf_zdevice = NULL;
-	      sport.uuconf_u.uuconf_sdirect.uuconf_ibaud = ibaud;
+              sport.uuconf_zname = zline;
+              sport.uuconf_ttype = UUCONF_PORTTYPE_DIRECT;
+              sport.uuconf_zprotocols = NULL;
+              sport.uuconf_qproto_params = NULL;
+              sport.uuconf_ireliable = 0;
+              sport.uuconf_zlockname = NULL;
+              sport.uuconf_palloc = NULL;
+              sport.uuconf_u.uuconf_sdirect.uuconf_zdevice = NULL;
+              sport.uuconf_u.uuconf_sdirect.uuconf_ibaud = ibaud;
 
-	      if (! fconn_init (&sport, &sconn, UUCONF_PORTTYPE_UNKNOWN))
-		ucuabort ();
+              if (! fconn_init (&sport, &sconn, UUCONF_PORTTYPE_UNKNOWN))
+                ucuabort ();
 
-	      if (! fconn_lock (&sconn, FALSE, TRUE))
-		ulog (LOG_FATAL, "%s: Line in use", zline);
+              if (! fconn_lock (&sconn, FALSE, TRUE))
+                ulog (LOG_FATAL, "%s: Line in use", zline);
 
-	      qCuconn = &sconn;
+              qCuconn = &sconn;
 
-	      /* Check user access after locking the port, because on
-		 some systems shared lines affect the ownership and
-		 permissions.  In such a case ``Line in use'' is more
-		 clear than ``Permission denied.''  */
-	      if (! fsysdep_port_access (&sport))
-		ulog (LOG_FATAL, "%s: Permission denied", zline);
-	    }
-	  iusebaud = ibaud;
-	  ihighbaud = 0L;
-	}
+              /* Check user access after locking the port, because on
+                 some systems shared lines affect the ownership and
+                 permissions.  In such a case ``Line in use'' is more
+                 clear than ``Permission denied.''  */
+              if (! fsysdep_port_access (&sport))
+                ulog (LOG_FATAL, "%s: Permission denied", zline);
+            }
+          iusebaud = ibaud;
+          ihighbaud = 0L;
+        }
       else
-	{
-	  for (; qsys != NULL; qsys = qsys->uuconf_qalternate)
-	    {
-	      if (! qsys->uuconf_fcall)
-		continue;
-	      if (qsys->uuconf_qport != NULL)
-		{
-		  if (fconn_init (qsys->uuconf_qport, &sconn,
-				  UUCONF_PORTTYPE_UNKNOWN))
-		    {
-		      if (fconn_lock (&sconn, FALSE, FALSE))
-			{
-			  qCuconn = &sconn;
-			  break;
-			}
-		      uconn_free (&sconn);
-		    }
-		}
-	      else
-		{
-		  sinfo.fmatched = FALSE;
-		  sinfo.flocked = FALSE;
-		  sinfo.qconn = &sconn;
-		  iuuconf = uuconf_find_port (puuconf, qsys->uuconf_zport,
-					      qsys->uuconf_ibaud,
-					      qsys->uuconf_ihighbaud,
-					      icuport_lock,
-					      (pointer) &sinfo,
-					      &sport);
-		  if (iuuconf == UUCONF_SUCCESS)
-		    break;
-		  if (iuuconf != UUCONF_NOT_FOUND)
-		    {
-		      if (sinfo.flocked)
-			{
-			  (void) fconn_unlock (&sconn);
-			  uconn_free (&sconn);
-			}
-		      ulog_uuconf (LOG_FATAL, puuconf, iuuconf);
-		    }
-		}
-	    }
+        {
+          for (; qsys != NULL; qsys = qsys->uuconf_qalternate)
+            {
+              if (! qsys->uuconf_fcall)
+                continue;
+              if (qsys->uuconf_qport != NULL)
+                {
+                  if (fconn_init (qsys->uuconf_qport, &sconn,
+                                  UUCONF_PORTTYPE_UNKNOWN))
+                    {
+                      if (fconn_lock (&sconn, FALSE, FALSE))
+                        {
+                          qCuconn = &sconn;
+                          break;
+                        }
+                      uconn_free (&sconn);
+                    }
+                }
+              else
+                {
+                  sinfo.fmatched = FALSE;
+                  sinfo.flocked = FALSE;
+                  sinfo.qconn = &sconn;
+                  iuuconf = uuconf_find_port (puuconf, qsys->uuconf_zport,
+                                              qsys->uuconf_ibaud,
+                                              qsys->uuconf_ihighbaud,
+                                              icuport_lock,
+                                              (pointer) &sinfo,
+                                              &sport);
+                  if (iuuconf == UUCONF_SUCCESS)
+                    break;
+                  if (iuuconf != UUCONF_NOT_FOUND)
+                    {
+                      if (sinfo.flocked)
+                        {
+                          (void) fconn_unlock (&sconn);
+                          uconn_free (&sconn);
+                        }
+                      ulog_uuconf (LOG_FATAL, puuconf, iuuconf);
+                    }
+                }
+            }
 
-	  if (qsys == NULL)
-	    {
-	      const char *zrem;
+          if (qsys == NULL)
+            {
+              const char *zrem;
 
-	      if (flooped)
-		zrem = "remaining ";
-	      else
-		zrem = "";
-	      if (sinfo.fmatched)
-		ulog (LOG_FATAL, "%s: All %smatching ports in use",
-		      zsystem, zrem);
-	      else
-		ulog (LOG_FATAL, "%s: No %smatching ports", zsystem, zrem);
-	    }
+              if (flooped)
+                zrem = "remaining ";
+              else
+                zrem = "";
+              if (sinfo.fmatched)
+                ulog (LOG_FATAL, "%s: All %smatching ports in use",
+                      zsystem, zrem);
+              else
+                ulog (LOG_FATAL, "%s: No %smatching ports", zsystem, zrem);
+            }
 
-	  iusebaud = qsys->uuconf_ibaud;
-	  ihighbaud = qsys->uuconf_ihighbaud;
-	}
+          iusebaud = qsys->uuconf_ibaud;
+          ihighbaud = qsys->uuconf_ihighbaud;
+        }
 
       /* Here we have locked a connection to use.  */
       if (! fconn_open (&sconn, iusebaud, ihighbaud, FALSE, sinfo.fdirect))
-	ucuabort ();
+        ucuabort ();
 
       fCuclose_conn = TRUE;
 
       if (FGOT_SIGNAL ())
-	ucuabort ();
+        ucuabort ();
 
       /* Set up the connection.  */
       if (fodd && feven)
-	{
-	  tparity = PARITYSETTING_NONE;
-	  tstrip = STRIPSETTING_SEVENBITS;
-	}
+        {
+          tparity = PARITYSETTING_NONE;
+          tstrip = STRIPSETTING_SEVENBITS;
+        }
       else if (fodd)
-	{
-	  tparity = PARITYSETTING_ODD;
-	  tstrip = STRIPSETTING_SEVENBITS;
-	}
+        {
+          tparity = PARITYSETTING_ODD;
+          tstrip = STRIPSETTING_SEVENBITS;
+        }
       else if (feven)
-	{
-	  tparity = PARITYSETTING_EVEN;
-	  tstrip = STRIPSETTING_SEVENBITS;
-	}
+        {
+          tparity = PARITYSETTING_EVEN;
+          tstrip = STRIPSETTING_SEVENBITS;
+        }
       else
-	{
-	  tparity = PARITYSETTING_DEFAULT;
-	  tstrip = STRIPSETTING_DEFAULT;
-	}
+        {
+          tparity = PARITYSETTING_DEFAULT;
+          tstrip = STRIPSETTING_DEFAULT;
+        }
 
       if (! fconn_set (&sconn, tparity, tstrip, txonxoff))
-	ucuabort ();
+        ucuabort ();
 
       if (qsys != NULL)
-	zphone = qsys->uuconf_zphone;
+        zphone = qsys->uuconf_zphone;
 
       if (qsys != NULL || zphone != NULL)
-	{
-	  enum tdialerfound tdialer;
+        {
+          enum tdialerfound tdialer;
 
-	  if (! fconn_dial (&sconn, puuconf, qsys, zphone, &sdialer,
-			    &tdialer))
-	    {
-	      if (zport != NULL
-		  || zline != NULL
-		  || ibaud != 0L
-		  || qsys == NULL)
-		ucuabort ();
+          if (! fconn_dial (&sconn, puuconf, qsys, zphone, &sdialer,
+                            &tdialer))
+            {
+              if (zport != NULL
+                  || zline != NULL
+                  || ibaud != 0L
+                  || qsys == NULL)
+                ucuabort ();
 
-	      qsys = qsys->uuconf_qalternate;
-	      if (qsys == NULL)
-		ulog (LOG_FATAL, "%s: No remaining alternates", zsystem);
+              qsys = qsys->uuconf_qalternate;
+              if (qsys == NULL)
+                ulog (LOG_FATAL, "%s: No remaining alternates", zsystem);
 
-	      fCuclose_conn = FALSE;
-	      (void) fconn_close (&sconn, pCuuuconf, qCudialer, FALSE);
-	      qCuconn = NULL;
-	      (void) fconn_unlock (&sconn);
-	      uconn_free (&sconn);
+              fCuclose_conn = FALSE;
+              (void) fconn_close (&sconn, pCuuuconf, qCudialer, FALSE);
+              qCuconn = NULL;
+              (void) fconn_unlock (&sconn);
+              uconn_free (&sconn);
 
-	      /* Loop around and try another alternate.  */
-	      flooped = TRUE;
-	      continue;
-	    }
-	  if (tdialer == DIALERFOUND_FALSE)
-	    qdialer = NULL;
-	  else
-	    qdialer = &sdialer;
-	}
+              /* Loop around and try another alternate.  */
+              flooped = TRUE;
+              continue;
+            }
+          if (tdialer == DIALERFOUND_FALSE)
+            qdialer = NULL;
+          else
+            qdialer = &sdialer;
+        }
       else
-	{
-	  /* If no system or phone number was specified, we connect
-	     directly to the modem.  We only permit this if the user
-	     has access to the port, since it permits various
-	     shenanigans such as reprogramming the automatic
-	     callbacks.  */
-	  if (! fsysdep_port_access (sconn.qport))
-	    ulog (LOG_FATAL, "Access to port denied");
-	  qdialer = NULL;
-	  if (! fconn_carrier (&sconn, FALSE))
-	    ulog (LOG_FATAL, "Can't turn off carrier");
-	}
+        {
+          /* If no system or phone number was specified, we connect
+             directly to the modem.  We only permit this if the user
+             has access to the port, since it permits various
+             shenanigans such as reprogramming the automatic
+             callbacks.  */
+          if (! fsysdep_port_access (sconn.qport))
+            ulog (LOG_FATAL, "Access to port denied");
+          qdialer = NULL;
+          if (! fconn_carrier (&sconn, FALSE))
+            ulog (LOG_FATAL, "Can't turn off carrier");
+        }
 
       break;
     }
@@ -821,7 +821,7 @@ static void
 ucuusage ()
 {
   fprintf (stderr, "Usage: %s [options] [system or phone-number]\n",
-	   zProgram);
+           zProgram);
   fprintf (stderr, "Use %s --help for help\n", zProgram);
   exit (EXIT_FAILURE);
 }
@@ -832,7 +832,7 @@ static void
 ucuhelp ()
 {
   printf ("Taylor UUCP %s, copyright (C) 1991, 92, 93, 94, 1995, 2002 Ian Lance Taylor\n",
-	  VERSION);
+          VERSION);
   printf ("Usage: %s [options] [system or phone-number]\n", zProgram);
   printf (" -a,-p,--port port: Use named port\n");
   printf (" -l,--line line: Use named device (e.g. tty0)\n");
@@ -879,10 +879,10 @@ ucuabort ()
       struct sconnection *qconn;
 
       if (fCuclose_conn)
-	{
-	  fCuclose_conn = FALSE;
-	  (void) fconn_close (qCuconn, pCuuuconf, qCudialer, FALSE);
-	}
+        {
+          fCuclose_conn = FALSE;
+          (void) fconn_close (qCuconn, pCuuuconf, qCudialer, FALSE);
+        }
       qconn = qCuconn;
       qCuconn = NULL;
       (void) fconn_unlock (qconn);
@@ -918,7 +918,7 @@ uculog_start ()
       fCulog_restore = TRUE;
       fCurestore_terminal = FALSE;
       if (! fsysdep_terminal_restore ())
-	ucuabort ();
+        ucuabort ();
     }
 }
 
@@ -931,7 +931,7 @@ uculog_end ()
   if (fCulog_restore)
     {
       if (! fsysdep_terminal_raw (fCulocalecho))
-	ucuabort ();
+        ucuabort ();
       fCurestore_terminal = TRUE;
     }
 }
@@ -1002,10 +1002,10 @@ fcudo_cmd (puuconf, qconn, bcmd)
     case 't':
     case 's':
       {
-	zline = zsysdep_terminal_line ((const char *) NULL);
-	if (zline == NULL)
-	  ucuabort ();
-	zline[strcspn (zline, "\n")] = '\0';
+        zline = zsysdep_terminal_line ((const char *) NULL);
+        if (zline == NULL)
+          ucuabort ();
+        zline[strcspn (zline, "\n")] = '\0';
       }
       break;
     }
@@ -1014,14 +1014,14 @@ fcudo_cmd (puuconf, qconn, bcmd)
     {
     default:
       if (! isprint (*zCuvar_escape))
-	sprintf (abescape, "\\%03o", BUCHAR (*zCuvar_escape));
+        sprintf (abescape, "\\%03o", BUCHAR (*zCuvar_escape));
       else
-	{
-	  abescape[0] = *zCuvar_escape;
-	  abescape[1] = '\0';
-	}
+        {
+          abescape[0] = *zCuvar_escape;
+          abescape[1] = '\0';
+        }
       sprintf (abbuf, "[Unrecognized.  Use %s%s to send %s]",
-	       abescape, abescape, abescape);
+               abescape, abescape, abescape);
       ucuputs (abbuf);
       return TRUE;
 
@@ -1035,26 +1035,26 @@ fcudo_cmd (puuconf, qconn, bcmd)
     case '+':
       /* Shell out.  */
       if (! fsysdep_cu_copy (FALSE)
-	  || ! fsysdep_terminal_restore ())
-	ucuabort ();
+          || ! fsysdep_terminal_restore ())
+        ucuabort ();
       fCurestore_terminal = FALSE;
       {
-	enum tshell_cmd t;
+        enum tshell_cmd t;
 
-	switch (bcmd)
-	  {
-	  default:
-	  case '!': t = SHELL_NORMAL; break;
-	  case '$': t = SHELL_STDOUT_TO_PORT; break;
-	  case '|': t = SHELL_STDIN_FROM_PORT; break;
-	  case '+': t = SHELL_STDIO_ON_PORT; break;
-	  }
-	  
-	(void) fsysdep_shell (qconn, zline, t);
+        switch (bcmd)
+          {
+          default:
+          case '!': t = SHELL_NORMAL; break;
+          case '$': t = SHELL_STDOUT_TO_PORT; break;
+          case '|': t = SHELL_STDIN_FROM_PORT; break;
+          case '+': t = SHELL_STDIO_ON_PORT; break;
+          }
+          
+        (void) fsysdep_shell (qconn, zline, t);
       }
       if (! fsysdep_cu_copy (TRUE)
-	  || ! fsysdep_terminal_raw (fCulocalecho))
-	ucuabort ();
+          || ! fsysdep_terminal_raw (fCulocalecho))
+        ucuabort ();
       fCurestore_terminal = TRUE;
       ubuffree (zline);
       return TRUE;
@@ -1066,7 +1066,7 @@ fcudo_cmd (puuconf, qconn, bcmd)
 
     case '#':
       if (! fconn_break (qconn))
-	ucuabort ();
+        ucuabort ();
       return TRUE;
 
     case 'c':
@@ -1090,14 +1090,14 @@ fcudo_cmd (puuconf, qconn, bcmd)
 
     case 'z':
       if (! fsysdep_cu_copy (FALSE)
-	  || ! fsysdep_terminal_restore ())
-	ucuabort ();
+          || ! fsysdep_terminal_restore ())
+        ucuabort ();
       fCurestore_terminal = FALSE;
       if (! fsysdep_suspend ())
-	ucuabort ();
+        ucuabort ();
       if (! fsysdep_cu_copy (TRUE)
-	  || ! fsysdep_terminal_raw (fCulocalecho))
-	ucuabort ();
+          || ! fsysdep_terminal_raw (fCulocalecho))
+        ucuabort ();
       fCurestore_terminal = TRUE;
       return TRUE;
       
@@ -1112,50 +1112,50 @@ fcudo_cmd (puuconf, qconn, bcmd)
 
     case '?':
       if (! isprint (*zCuvar_escape))
-	sprintf (abescape, "\\%03o", BUCHAR (*zCuvar_escape));
+        sprintf (abescape, "\\%03o", BUCHAR (*zCuvar_escape));
       else
-	{
-	  abescape[0] = *zCuvar_escape;
-	  abescape[1] = '\0';
-	}
+        {
+          abescape[0] = *zCuvar_escape;
+          abescape[1] = '\0';
+        }
       ucuputs ("");
       ucuputs ("[Escape sequences]");
       sprintf (abbuf,
-	       "[%s. hangup]                   [%s!CMD run shell]",
-	       abescape, abescape);
+               "[%s. hangup]                   [%s!CMD run shell]",
+               abescape, abescape);
       ucuputs (abbuf);
       sprintf (abbuf,
-	       "[%s$CMD stdout to remote]      [%s|CMD stdin from remote]",
-	       abescape, abescape);
+               "[%s$CMD stdout to remote]      [%s|CMD stdin from remote]",
+               abescape, abescape);
       ucuputs (abbuf);
       sprintf (abbuf,
-	       "[%s+CMD stdin and stdout to remote]",
-	       abescape);
+               "[%s+CMD stdin and stdout to remote]",
+               abescape);
       ucuputs (abbuf);
       sprintf (abbuf,
-	       "[%s# send break]               [%scDIR change directory]",
-	       abescape, abescape);
+               "[%s# send break]               [%scDIR change directory]",
+               abescape, abescape);
       ucuputs (abbuf);
       sprintf (abbuf,
-	       "[%s> send file]                [%s< receive file]",
-	       abescape, abescape);
+               "[%s> send file]                [%s< receive file]",
+               abescape, abescape);
       ucuputs (abbuf);
       sprintf (abbuf,
-	       "[%spFROM TO send to Unix]      [%stFROM TO receive from Unix]",
-	       abescape, abescape);
+               "[%spFROM TO send to Unix]      [%stFROM TO receive from Unix]",
+               abescape, abescape);
       ucuputs (abbuf);
       sprintf (abbuf,
-	       "[%ssVAR VAL set variable]      [%ssVAR set boolean]",
-	       abescape, abescape);
+               "[%ssVAR VAL set variable]      [%ssVAR set boolean]",
+               abescape, abescape);
       ucuputs (abbuf);
       sprintf (abbuf,
-	       "[%ss!VAR unset boolean]        [%sv list variables]",
-	       abescape, abescape);
+               "[%ss!VAR unset boolean]        [%sv list variables]",
+               abescape, abescape);
       ucuputs (abbuf);
 #ifdef SIGTSTP
       sprintf (abbuf,
-	       "[%sz suspend]",
-	       abescape);
+               "[%sz suspend]",
+               abescape);
       ucuputs (abbuf);
 #endif
       uculist_fns (abescape);
@@ -1172,16 +1172,16 @@ uculist_fns (zescape)
   char abbuf[100];
 
   sprintf (abbuf,
-	   "[%s%%break send break]         [%s%%cd DIR change directory]",
-	   zescape, zescape);
+           "[%s%%break send break]         [%s%%cd DIR change directory]",
+           zescape, zescape);
   ucuputs (abbuf);
   sprintf (abbuf,
-	   "[%s%%put FROM TO send file]    [%s%%take FROM TO receive file]",
-	   zescape, zescape);
+           "[%s%%put FROM TO send file]    [%s%%take FROM TO receive file]",
+           zescape, zescape);
   ucuputs (abbuf);
   sprintf (abbuf,
-	   "[%s%%nostop no XON/XOFF]       [%s%%stop use XON/XOFF]",
-	   zescape, zescape);
+           "[%s%%nostop no XON/XOFF]       [%s%%stop use XON/XOFF]",
+           zescape, zescape);
   ucuputs (abbuf);
 }
 
@@ -1209,12 +1209,12 @@ fcuset_var (puuconf, zline)
     {
       azargs[0] = zvar;
       if (azargs[0][0] != '!')
-	azargs[1] = zbufcpy ("t");
+        azargs[1] = zbufcpy ("t");
       else
-	{
-	  ++azargs[0];
-	  azargs[1] = zbufcpy ("f");
-	}
+        {
+          ++azargs[0];
+          azargs[1] = zbufcpy ("f");
+        }
     }
   else
     {
@@ -1223,8 +1223,8 @@ fcuset_var (puuconf, zline)
     }
 
   iuuconf = uuconf_cmd_args (puuconf, 2, azargs, asCuvars,
-			     (pointer) NULL, icuunrecogvar, 0,
-			     (pointer) NULL);
+                             (pointer) NULL, icuunrecogvar, 0,
+                             (pointer) NULL);
 
   if ((iuuconf & UUCONF_CMDTABRET_KEEP) == 0)
     ubuffree (azargs[1]);
@@ -1256,7 +1256,7 @@ icuunrecogvar (puuconf, argc, argv, pvar, pinfo)
       abescape[1] = '\0';
     }
   ulog (LOG_ERROR, "%s: unknown variable (%sv lists variables)",
-	argv[0], abescape);
+        argv[0], abescape);
   return UUCONF_CMDTABRET_CONTINUE;
 }
 
@@ -1272,58 +1272,58 @@ uculist_vars ()
   for (q = asCuvars; q->uuconf_zcmd != NULL; q++)
     {
       switch (UUCONF_TTYPE_CMDTABTYPE (q->uuconf_itype))
-	{
-	case UUCONF_TTYPE_CMDTABTYPE (UUCONF_CMDTABTYPE_BOOLEAN):
-	  if (*(boolean *) q->uuconf_pvar)
-	    sprintf (abbuf, "%s true", q->uuconf_zcmd);
-	  else
-	    sprintf (abbuf, "%s false", q->uuconf_zcmd);
-	  break;
+        {
+        case UUCONF_TTYPE_CMDTABTYPE (UUCONF_CMDTABTYPE_BOOLEAN):
+          if (*(boolean *) q->uuconf_pvar)
+            sprintf (abbuf, "%s true", q->uuconf_zcmd);
+          else
+            sprintf (abbuf, "%s false", q->uuconf_zcmd);
+          break;
 
-	case UUCONF_TTYPE_CMDTABTYPE (UUCONF_CMDTABTYPE_INT):
-	  sprintf (abbuf, "%s %d", q->uuconf_zcmd, *(int *) q->uuconf_pvar);
-	  break;
+        case UUCONF_TTYPE_CMDTABTYPE (UUCONF_CMDTABTYPE_INT):
+          sprintf (abbuf, "%s %d", q->uuconf_zcmd, *(int *) q->uuconf_pvar);
+          break;
 
-	case UUCONF_TTYPE_CMDTABTYPE (UUCONF_CMDTABTYPE_LONG):
-	  sprintf (abbuf, "%s %ld", q->uuconf_zcmd,
-		   *(long *) q->uuconf_pvar);
-	  break;
+        case UUCONF_TTYPE_CMDTABTYPE (UUCONF_CMDTABTYPE_LONG):
+          sprintf (abbuf, "%s %ld", q->uuconf_zcmd,
+                   *(long *) q->uuconf_pvar);
+          break;
 
-	case UUCONF_TTYPE_CMDTABTYPE (UUCONF_CMDTABTYPE_STRING):
-	case UUCONF_TTYPE_CMDTABTYPE (UUCONF_CMDTABTYPE_FULLSTRING):
-	  {
-	    const char *z;
-	    char abchar[5];
-	    size_t clen;
+        case UUCONF_TTYPE_CMDTABTYPE (UUCONF_CMDTABTYPE_STRING):
+        case UUCONF_TTYPE_CMDTABTYPE (UUCONF_CMDTABTYPE_FULLSTRING):
+          {
+            const char *z;
+            char abchar[5];
+            size_t clen;
 
-	    sprintf (abbuf, "%s ", q->uuconf_zcmd);
-	    clen = strlen (abbuf);
-	    for (z = *(const char **) q->uuconf_pvar; *z != '\0'; z++)
-	      {
-		int cchar;
+            sprintf (abbuf, "%s ", q->uuconf_zcmd);
+            clen = strlen (abbuf);
+            for (z = *(const char **) q->uuconf_pvar; *z != '\0'; z++)
+              {
+                int cchar;
 
-		if (! isprint (*z))
-		  {
-		    sprintf (abchar, "\\%03o", BUCHAR (*z));
-		    cchar = 4;
-		  }
-		else
-		  {
-		    abchar[0] = *z;
-		    abchar[1] = '\0';
-		    cchar = 1;
-		  }
-		if (clen + cchar < sizeof (abbuf))
-		  strcat (abbuf, abchar);
-		clen += cchar;
-	      }
-	  }
-	  break;
+                if (! isprint (*z))
+                  {
+                    sprintf (abchar, "\\%03o", BUCHAR (*z));
+                    cchar = 4;
+                  }
+                else
+                  {
+                    abchar[0] = *z;
+                    abchar[1] = '\0';
+                    cchar = 1;
+                  }
+                if (clen + cchar < sizeof (abbuf))
+                  strcat (abbuf, abchar);
+                clen += cchar;
+              }
+          }
+          break;
 
-	default:
-	  sprintf (abbuf, "%s [unprintable type]", q->uuconf_zcmd);
-	  break;
-	}
+        default:
+          sprintf (abbuf, "%s [unprintable type]", q->uuconf_zcmd);
+          break;
+        }
 
       ucuputs (abbuf);
     }
@@ -1339,17 +1339,17 @@ static char bCutype;
 /* The command table for the subcommands.  */
 
 static int icubreak P((pointer puuconf, int argc, char **argv, pointer pvar,
-		       pointer pinfo));
+                       pointer pinfo));
 static int icudebug P((pointer puuconf, int argc, char **argv, pointer pvar,
-		       pointer pinfo));
+                       pointer pinfo));
 static int icuchdir P((pointer puuconf, int argc, char **argv, pointer pvar,
-		       pointer pinfo));
+                       pointer pinfo));
 static int icuput P((pointer puuconf, int argc, char **argv, pointer pvar,
-		     pointer pinfo));
+                     pointer pinfo));
 static int icutake P((pointer puuconf, int argc, char **argv, pointer pvar,
-		      pointer pinfo));
+                      pointer pinfo));
 static int icunostop P((pointer puuconf, int argc, char **argv, pointer pvar,
-			pointer pinfo));
+                        pointer pinfo));
 
 static const struct uuconf_cmdtab asCucmds[] =
 {
@@ -1384,7 +1384,7 @@ fcudo_subcmd (puuconf, qconn, zline)
     {
       azargs[iarg] = strtok (iarg == 0 ? zline : (char *) NULL, " \t\n");
       if (azargs[iarg] == NULL)
-	break;
+        break;
     }
 
   if (iarg == 0)
@@ -1394,8 +1394,8 @@ fcudo_subcmd (puuconf, qconn, zline)
     }
 
   iuuconf = uuconf_cmd_args (puuconf, iarg, azargs, asCucmds,
-			     (pointer) qconn, icuunrecogfn,
-			     0, (pointer) NULL);
+                             (pointer) qconn, icuunrecogfn,
+                             0, (pointer) NULL);
   if (iuuconf != UUCONF_SUCCESS)
     ulog_uuconf (LOG_ERROR, puuconf, iuuconf);
 
@@ -1426,7 +1426,7 @@ icuunrecogfn (puuconf, argc, argv, pvar, pinfo)
     uculist_fns (abescape);
   else
     ulog (LOG_ERROR, "%s: unknown (%s%%? lists choices)",
-	  argv[0], abescape);
+          argv[0], abescape);
   return UUCONF_CMDTABRET_CONTINUE;
 }
 
@@ -1506,7 +1506,7 @@ icunostop (puuconf, argc, argv, pvar, pinfo)
   struct sconnection *qconn = (struct sconnection *) pinfo;
 
   if (! fconn_set (qconn, PARITYSETTING_DEFAULT, STRIPSETTING_DEFAULT,
-		   pvar == NULL ? XONXOFF_OFF : XONXOFF_ON))
+                   pvar == NULL ? XONXOFF_OFF : XONXOFF_ON))
     ucuabort ();
   return UUCONF_CMDTABRET_CONTINUE;
 }
@@ -1544,47 +1544,47 @@ icuput (puuconf, argc, argv, pvar, pinfo)
     {
       zfrom = zsysdep_terminal_line ("File to send: ");
       if (zfrom == NULL)
-	ucuabort ();
+        ucuabort ();
       zfrom[strcspn (zfrom, " \t\n")] = '\0';
 
       if (*zfrom == '\0')
-	{
-	  ubuffree (zfrom);
-	  ucuputs (abCuconnected);
-	  return UUCONF_CMDTABRET_CONTINUE;
-	}
+        {
+          ubuffree (zfrom);
+          ucuputs (abCuconnected);
+          return UUCONF_CMDTABRET_CONTINUE;
+        }
     }
 
   if (pvar == NULL)
     {
       if (argc > 2)
-	zto = zbufcpy (argv[2]);
+        zto = zbufcpy (argv[2]);
       else
-	{
-	  char *zbase;
-	  char *zprompt;
+        {
+          char *zbase;
+          char *zprompt;
 
-	  zbase = zsysdep_base_name (zfrom);
-	  if (zbase == NULL)
-	    ucuabort ();
+          zbase = zsysdep_base_name (zfrom);
+          if (zbase == NULL)
+            ucuabort ();
 
-	  zprompt = zbufalc (sizeof "Remote file name []: " +
-			     strlen (zbase));
-	  sprintf (zprompt, "Remote file name [%s]: ", zbase);
-	  zto = zsysdep_terminal_line (zprompt);
-	  ubuffree (zprompt);
-	  if (zto == NULL)
-	    ucuabort ();
+          zprompt = zbufalc (sizeof "Remote file name []: " +
+                             strlen (zbase));
+          sprintf (zprompt, "Remote file name [%s]: ", zbase);
+          zto = zsysdep_terminal_line (zprompt);
+          ubuffree (zprompt);
+          if (zto == NULL)
+            ucuabort ();
 
-	  zto[strcspn (zto, " \t\n")] = '\0';
-	  if (*zto != '\0')
-	    ubuffree (zbase);
-	  else
-	    {
-	      ubuffree (zto);
-	      zto = zbase;
-	    }
-	}
+          zto[strcspn (zto, " \t\n")] = '\0';
+          if (*zto != '\0')
+            ubuffree (zbase);
+          else
+            {
+              ubuffree (zto);
+              zto = zbase;
+            }
+        }
     }
 
   e = esysdep_user_fopen (zfrom, TRUE, fCuvar_binary);
@@ -1593,7 +1593,7 @@ icuput (puuconf, argc, argv, pvar, pinfo)
       const char *zerrstr;
 
       if (pvar == NULL)
-	ubuffree (zto);
+        ubuffree (zto);
       zerrstr = strerror (errno);
       zalc = zbufalc (strlen (zfrom) + sizeof ": " + strlen (zerrstr));
       sprintf (zalc, "%s: %s", zfrom, zerrstr);
@@ -1627,14 +1627,14 @@ icuput (puuconf, argc, argv, pvar, pinfo)
       fret = fcusend_buf (qconn, zalc, strlen (zalc));
       ubuffree (zalc);
       if (! fret)
-	{
-	  (void) ffileclose (e);
-	  if (! fsysdep_cu_copy (TRUE)
-	      || ! fsysdep_terminal_signals (FALSE))
-	    ucuabort ();
-	  ucuputs (abCuconnected);
-	  return UUCONF_CMDTABRET_CONTINUE;
-	}
+        {
+          (void) ffileclose (e);
+          if (! fsysdep_cu_copy (TRUE)
+              || ! fsysdep_terminal_signals (FALSE))
+            ucuabort ();
+          ucuputs (abCuconnected);
+          return UUCONF_CMDTABRET_CONTINUE;
+        }
     }
 
   cline = 0;
@@ -1650,49 +1650,49 @@ icuput (puuconf, argc, argv, pvar, pinfo)
 #if USE_STDIO
       if (fCuvar_binary)
 #endif
-	{
-	  if (ffileeof (e))
-	    break;
-	  c = cfileread (e, abbuf, sizeof abbuf);
-	  if (ffileioerror (e, c))
-	    {
-	      ucuputs ("[file read error]");
-	      break;
-	    }
-	  if (c == 0)
-	    break;
-	  zbuf = abbuf;
-	}
+        {
+          if (ffileeof (e))
+            break;
+          c = cfileread (e, abbuf, sizeof abbuf);
+          if (ffileioerror (e, c))
+            {
+              ucuputs ("[file read error]");
+              break;
+            }
+          if (c == 0)
+            break;
+          zbuf = abbuf;
+        }
 #if USE_STDIO
       else
-	{
-	  if (getline (&zbuf, &cbuf, e) <= 0)
-	    {
-	      xfree ((pointer) zbuf);
-	      break;
-	    }
-	  c = strlen (zbuf);
-	}
+        {
+          if (getline (&zbuf, &cbuf, e) <= 0)
+            {
+              xfree ((pointer) zbuf);
+              break;
+            }
+          c = strlen (zbuf);
+        }
 #endif
 
       if (fCuvar_verbose)
-	{
-	  ++cline;
-	  printf ("%d ", cline);
-	  (void) fflush (stdout);
-	}
+        {
+          ++cline;
+          printf ("%d ", cline);
+          (void) fflush (stdout);
+        }
 
       if (! fcusend_buf (qconn, zbuf, c))
-	{
-	  if (! fCuvar_binary)
-	    xfree ((pointer) zbuf);
-	  (void) fclose (e);
-	  if (! fsysdep_cu_copy (TRUE)
-	      || ! fsysdep_terminal_signals (FALSE))
-	    ucuabort ();
-	  ucuputs (abCuconnected);
-	  return UUCONF_CMDTABRET_CONTINUE;
-	}
+        {
+          if (! fCuvar_binary)
+            xfree ((pointer) zbuf);
+          (void) fclose (e);
+          if (! fsysdep_cu_copy (TRUE)
+              || ! fsysdep_terminal_signals (FALSE))
+            ucuabort ();
+          ucuputs (abCuconnected);
+          return UUCONF_CMDTABRET_CONTINUE;
+        }
     }
 
   (void) ffileclose (e);
@@ -1703,16 +1703,16 @@ icuput (puuconf, argc, argv, pvar, pinfo)
 
       beof = '\004';
       if (! fconn_write (qconn, &beof, 1))
-	ucuabort ();
+        ucuabort ();
     }
   else
     {
       if (*zCuvar_eofwrite != '\0')
-	{
-	  if (! fconn_write (qconn, zCuvar_eofwrite,
-			     strlen (zCuvar_eofwrite)))
-	    ucuabort ();
-	}
+        {
+          if (! fconn_write (qconn, zCuvar_eofwrite,
+                             strlen (zCuvar_eofwrite)))
+            ucuabort ();
+        }
     }
 
   if (fCuvar_verbose)
@@ -1758,14 +1758,14 @@ icutake (puuconf, argc, argv, pvar, pinfo)
     {
       zfrom = zsysdep_terminal_line ("Remote file to retreive: ");
       if (zfrom == NULL)
-	ucuabort ();
+        ucuabort ();
       zfrom[strcspn (zfrom, " \t\n")] = '\0';
       if (*zfrom == '\0')
-	{
-	  ubuffree (zfrom);
-	  ucuputs (abCuconnected);
-	  return UUCONF_CMDTABRET_CONTINUE;
-	}
+        {
+          ubuffree (zfrom);
+          ucuputs (abCuconnected);
+          return UUCONF_CMDTABRET_CONTINUE;
+        }
     }
 
   if (argc > 2)
@@ -1777,37 +1777,37 @@ icutake (puuconf, argc, argv, pvar, pinfo)
 
       zbase = zsysdep_base_name (zfrom);
       if (zbase == NULL)
-	ucuabort ();
+        ucuabort ();
 
       zprompt = zbufalc (sizeof "Local file name []: " + strlen (zbase));
       sprintf (zprompt, "Local file name [%s]: ", zbase);
       zto = zsysdep_terminal_line (zprompt);
       ubuffree (zprompt);
       if (zto == NULL)
-	ucuabort ();
+        ucuabort ();
 
       zto[strcspn (zto, " \t\n")] = '\0';
       if (*zto != '\0')
-	ubuffree (zbase);
+        ubuffree (zbase);
       else
-	{
-	  ubuffree (zto);
-	  zto = zbase;
-	}
+        {
+          ubuffree (zto);
+          zto = zbase;
+        }
     }
 
   if (pvar != NULL)
     {
       zcmd = zsysdep_terminal_line ("Remote command to execute: ");
       if (zcmd == NULL)
-	ucuabort ();
+        ucuabort ();
       zcmd[strcspn (zcmd, "\n")] = '\0';
       zeof = zCuvar_eofread;
     }
   else
     {
       zcmd = zbufalc (sizeof "cat ; echo; echo ////cuend////"
-		      + strlen (zfrom));
+                      + strlen (zfrom));
       sprintf (zcmd, "cat %s; echo; echo ////cuend////", zfrom);
       zeof = "\n////cuend////\n";
     }
@@ -1854,17 +1854,17 @@ icutake (puuconf, argc, argv, pvar, pinfo)
       int b;
 
       while ((b = breceive_char (qconn, cCuvar_timeout, TRUE)) != '\n')
-	{
-	  if (b == -2)
-	    ucuabort ();
-	  if (b < 0)
-	    {
-	      ucuputs ("[timed out waiting for newline]");
-	      ucuputs (abCuconnected);
-	      ubuffree (zto);
-	      return UUCONF_CMDTABRET_CONTINUE;
-	    }
-	}
+        {
+          if (b == -2)
+            ucuabort ();
+          if (b < 0)
+            {
+              ucuputs ("[timed out waiting for newline]");
+              ucuputs (abCuconnected);
+              ubuffree (zto);
+              return UUCONF_CMDTABRET_CONTINUE;
+            }
+        }
     }
 
   ceoflen = strlen (zeof);
@@ -1877,68 +1877,68 @@ icutake (puuconf, argc, argv, pvar, pinfo)
       int b;
 
       if (FGOT_SIGNAL ())
-	{
-	  /* Make sure the signal is logged.  */
-	  ulog (LOG_ERROR, (const char *) NULL);
-	  ucuputs ("[file receive aborted]");
-	  /* Reset the SIGINT flag so that it does not confuse us in
-	     the future.  */
-	  afSignal[INDEXSIG_SIGINT] = FALSE;
-	  break;
-	}	
+        {
+          /* Make sure the signal is logged.  */
+          ulog (LOG_ERROR, (const char *) NULL);
+          ucuputs ("[file receive aborted]");
+          /* Reset the SIGINT flag so that it does not confuse us in
+             the future.  */
+          afSignal[INDEXSIG_SIGINT] = FALSE;
+          break;
+        }       
 
       b = breceive_char (qconn, cCuvar_timeout, TRUE);
       if (b == -2)
-	ucuabort ();
+        ucuabort ();
       if (b < 0)
-	{
-	  if (ceofhave > 0)
-	    (void) fwrite (zlook, sizeof (char), ceofhave, e);
-	  ucuputs ("[timed out]");
-	  break;
-	}
+        {
+          if (ceofhave > 0)
+            (void) fwrite (zlook, sizeof (char), ceofhave, e);
+          ucuputs ("[timed out]");
+          break;
+        }
 
       if (b == '\r' && ! fCuvar_binary)
-	continue;
+        continue;
 
       if (ceoflen == 0)
-	{
-	  if (cfilewrite (e, &b, 1) != 1)
-	    {
-	      ferr = TRUE;
-	      break;
-	    }
-	}
+        {
+          if (cfilewrite (e, &b, 1) != 1)
+            {
+              ferr = TRUE;
+              break;
+            }
+        }
       else
-	{
-	  zlook[ceofhave] = b;
-	  ++ceofhave;
-	  if (ceofhave == ceoflen)
-	    {
-	      size_t cmove;
-	      char *zmove;
+        {
+          zlook[ceofhave] = b;
+          ++ceofhave;
+          if (ceofhave == ceoflen)
+            {
+              size_t cmove;
+              char *zmove;
 
-	      if (memcmp (zeof, zlook, ceoflen) == 0)
-		{
-		  ucuputs ("[file transfer complete]");
-		  break;
-		}
+              if (memcmp (zeof, zlook, ceoflen) == 0)
+                {
+                  ucuputs ("[file transfer complete]");
+                  break;
+                }
 
-	      if (cfilewrite (e, zlook, 1) != 1)
-		{
-		  ferr = TRUE;
-		  break;
-		}
+              if (cfilewrite (e, zlook, 1) != 1)
+                {
+                  ferr = TRUE;
+                  break;
+                }
 
-	      zmove = zlook;
-	      for (cmove = ceoflen - 1, zmove = zlook;
-		   cmove > 0;
-		   cmove--, zmove++)
-		zmove[0] = zmove[1];
+              zmove = zlook;
+              for (cmove = ceoflen - 1, zmove = zlook;
+                   cmove > 0;
+                   cmove--, zmove++)
+                zmove[0] = zmove[1];
 
-	      --ceofhave;
-	    }
-	}
+              --ceofhave;
+            }
+        }
     }
 
   ubuffree (zlook);
@@ -1951,7 +1951,7 @@ icutake (puuconf, argc, argv, pvar, pinfo)
   else
     {
       if (! ffileclose (e))
-	ferr = TRUE;
+        ferr = TRUE;
     }
   if (ferr)
     ucuputs ("[file write error]");
@@ -2007,159 +2007,159 @@ fcusend_buf (qconn, zbufarg, cbufarg)
       int i;
 
       if (FGOT_SIGNAL ())
-	{
-	  /* Make sure the signal is logged.  */
-	  ubuffree (zsendbuf);
-	  ulog (LOG_ERROR, (const char *) NULL);
-	  ucuputs ("[file send aborted]");
-	  /* Reset the SIGINT flag so that it does not confuse us in
-	     the future.  */
-	  afSignal[INDEXSIG_SIGINT] = FALSE;
-	  return FALSE;
-	}
+        {
+          /* Make sure the signal is logged.  */
+          ubuffree (zsendbuf);
+          ulog (LOG_ERROR, (const char *) NULL);
+          ucuputs ("[file send aborted]");
+          /* Reset the SIGINT flag so that it does not confuse us in
+             the future.  */
+          afSignal[INDEXSIG_SIGINT] = FALSE;
+          return FALSE;
+        }
 
       /* Discard anything we've read from the port up to now, to avoid
-	 confusing the echo checking.  */
+         confusing the echo checking.  */
       iPrecstart = 0;
       iPrecend = 0;
 
       /* Send all characters up to a newline before actually sending
-	 the newline.  This makes it easier to handle the special
-	 newline echo checking.  Send up to 64 characters at a time
-	 before doing echo checking.  */
+         the newline.  This makes it easier to handle the special
+         newline echo checking.  Send up to 64 characters at a time
+         before doing echo checking.  */
       if (*zbuf == '\n')
-	csend = 1;
+        csend = 1;
       else
-	{
-	  const char *znl;
+        {
+          const char *znl;
 
-	  znl = memchr (zbuf, '\n', cbuf);
-	  if (znl == NULL)
-	    csend = cbuf;
-	  else
-	    csend = znl - zbuf;
-	  if (csend > 64)
-	    csend = 64;
-	}
+          znl = memchr (zbuf, '\n', cbuf);
+          if (znl == NULL)
+            csend = cbuf;
+          else
+            csend = znl - zbuf;
+          if (csend > 64)
+            csend = 64;
+        }
 
       /* Translate this part of the buffer.  If we are not in binary
-	 mode, we translate \n to \r, and ignore any nonprintable
-	 characters.  */
+         mode, we translate \n to \r, and ignore any nonprintable
+         characters.  */
       zput = zsendbuf;
       fnl = FALSE;
       for (i = 0, zget = zbuf; i < csend; i++, zget++)
-	{
-	  if (isprint (*zget)
-	      || *zget == '\t')
-	    *zput++ = *zget;
-	  else if (*zget == '\n')
-	    {
-	      if (fCuvar_binary)
-		*zput++ = '\n';
-	      else
-		*zput++ = '\r';
-	      fnl = TRUE;
-	    }
-	  else if (fCuvar_binary)
-	    {
-	      strcpy (zput, zCuvar_binary_prefix);
-	      zput += cbplen;
-	      *zput++ = *zget;
-	    }
-	}
-		
+        {
+          if (isprint (*zget)
+              || *zget == '\t')
+            *zput++ = *zget;
+          else if (*zget == '\n')
+            {
+              if (fCuvar_binary)
+                *zput++ = '\n';
+              else
+                *zput++ = '\r';
+              fnl = TRUE;
+            }
+          else if (fCuvar_binary)
+            {
+              strcpy (zput, zCuvar_binary_prefix);
+              zput += cbplen;
+              *zput++ = *zget;
+            }
+        }
+                
       zbuf += csend;
       cbuf -= csend;
 
       if (zput == zsendbuf)
-	continue;
+        continue;
 
       /* Send the data over the port.  */
       if (! fsend_data (qconn, zsendbuf, (size_t) (zput - zsendbuf), TRUE))
-	ucuabort ();
+        ucuabort ();
 
       /* We do echo checking if requested, unless we are in binary
-	 mode.  Echo checking of a newline is different from checking
-	 of normal characters; when we send a newline we look for
-	 *zCuvar_echonl.  */
+         mode.  Echo checking of a newline is different from checking
+         of normal characters; when we send a newline we look for
+         *zCuvar_echonl.  */
       if ((fCuvar_echocheck && ! fCuvar_binary)
-	  || (fnl && *zCuvar_echonl != '\0'))
-	{
-	  long iend;
+          || (fnl && *zCuvar_echonl != '\0'))
+        {
+          long iend;
 
-	  iend = ixsysdep_time ((long *) NULL) + (long) cCuvar_timeout;
-	  for (zget = zsendbuf; zget < zput; zget++)
-	    {
-	      int bread;
-	      int bwant;
+          iend = ixsysdep_time ((long *) NULL) + (long) cCuvar_timeout;
+          for (zget = zsendbuf; zget < zput; zget++)
+            {
+              int bread;
+              int bwant;
 
-	      if (fCuvar_binary ? *zget == '\n' : *zget == '\r')
-		{
-		  bwant = *zCuvar_echonl;
-		  if (bwant == '\0')
-		    continue;
-		}
-	      else
-		{
-		  if (! fCuvar_echocheck || ! isprint (*zget))
-		    continue;
-		  bwant = *zget;
-		}
+              if (fCuvar_binary ? *zget == '\n' : *zget == '\r')
+                {
+                  bwant = *zCuvar_echonl;
+                  if (bwant == '\0')
+                    continue;
+                }
+              else
+                {
+                  if (! fCuvar_echocheck || ! isprint (*zget))
+                    continue;
+                  bwant = *zget;
+                }
 
-	      do
-		{
-		  if (FGOT_SIGNAL ())
-		    {
-		      /* Make sure the signal is logged.  */
-		      ubuffree (zsendbuf);
-		      ulog (LOG_ERROR, (const char *) NULL);
-		      ucuputs ("[file send aborted]");
-		      /* Reset the SIGINT flag so that it does not
-			 confuse us in the future.  */
-		      afSignal[INDEXSIG_SIGINT] = FALSE;
-		      return FALSE;
-		    }
+              do
+                {
+                  if (FGOT_SIGNAL ())
+                    {
+                      /* Make sure the signal is logged.  */
+                      ubuffree (zsendbuf);
+                      ulog (LOG_ERROR, (const char *) NULL);
+                      ucuputs ("[file send aborted]");
+                      /* Reset the SIGINT flag so that it does not
+                         confuse us in the future.  */
+                      afSignal[INDEXSIG_SIGINT] = FALSE;
+                      return FALSE;
+                    }
 
-		  bread = breceive_char (qconn,
-					 iend - ixsysdep_time ((long *) NULL),
-					 TRUE);
-		  if (bread < 0)
-		    {
-		      if (bread == -2)
-			ucuabort ();
+                  bread = breceive_char (qconn,
+                                         iend - ixsysdep_time ((long *) NULL),
+                                         TRUE);
+                  if (bread < 0)
+                    {
+                      if (bread == -2)
+                        ucuabort ();
 
-		      /* If we timed out, and we're not in binary
-			 mode, we kill the line and try sending it
-			 again from the beginning.  */
-		      if (! fCuvar_binary && *zCuvar_kill != '\0')
-			{
-			  ++ctries;
-			  if (ctries < cCuvar_resend)
-			    {
-			      if (fCuvar_verbose)
-				{
-				  printf ("R ");
-				  (void) fflush (stdout);
-				}
-			      if (! fsend_data (qconn, zCuvar_kill, 1,
-						TRUE))
-				ucuabort ();
-			      zbuf = zbufarg;
-			      cbuf = cbufarg;
-			      break;
-			    }
-			}
-		      ubuffree (zsendbuf);
-		      ucuputs ("[timed out looking for echo]");
-		      return FALSE;
-		    }
-		}
-	      while (bread != *zget);
+                      /* If we timed out, and we're not in binary
+                         mode, we kill the line and try sending it
+                         again from the beginning.  */
+                      if (! fCuvar_binary && *zCuvar_kill != '\0')
+                        {
+                          ++ctries;
+                          if (ctries < cCuvar_resend)
+                            {
+                              if (fCuvar_verbose)
+                                {
+                                  printf ("R ");
+                                  (void) fflush (stdout);
+                                }
+                              if (! fsend_data (qconn, zCuvar_kill, 1,
+                                                TRUE))
+                                ucuabort ();
+                              zbuf = zbufarg;
+                              cbuf = cbufarg;
+                              break;
+                            }
+                        }
+                      ubuffree (zsendbuf);
+                      ucuputs ("[timed out looking for echo]");
+                      return FALSE;
+                    }
+                }
+              while (bread != *zget);
 
-	      if (bread < 0)
-		break;
-	    }
-	}
+              if (bread < 0)
+                break;
+            }
+        }
     }
 
   ubuffree (zsendbuf);

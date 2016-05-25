@@ -68,21 +68,21 @@ fsend_data (qconn, zsend, csend, fdoread)
       size_t crec, csent;
 
       if (iPrecend < iPrecstart)
-	crec = iPrecstart - iPrecend - 1;
+        crec = iPrecstart - iPrecend - 1;
       else
-	{
-	  crec = CRECBUFLEN - iPrecend;
-	  if (iPrecstart == 0)
-	    --crec;
-	}
+        {
+          crec = CRECBUFLEN - iPrecend;
+          if (iPrecstart == 0)
+            --crec;
+        }
 
       if (crec == 0)
-	return fconn_write (qconn, zsend, csend);
+        return fconn_write (qconn, zsend, csend);
 
       csent = csend;
 
       if (! fconn_io (qconn, zsend, &csent, abPrecbuf + iPrecend, &crec))
-	return FALSE;
+        return FALSE;
 
       csend -= csent;
       zsend += csent;
@@ -119,7 +119,7 @@ freceive_data (qconn, cneed, pcrec, ctimeout, freport)
     {
       *pcrec = CRECBUFLEN - iPrecend;
       if (iPrecstart == 0)
-	--(*pcrec);
+        --(*pcrec);
     }
 
 #if DEBUG > 0
@@ -135,7 +135,7 @@ freceive_data (qconn, cneed, pcrec, ctimeout, freport)
     cneed = *pcrec;
 
   if (! fconn_read (qconn, abPrecbuf + iPrecend, pcrec, cneed, ctimeout,
-		    freport))
+                    freport))
     return FALSE;
 
   iPrecend = (iPrecend + *pcrec) % CRECBUFLEN;
@@ -167,9 +167,9 @@ breceive_char (qconn, ctimeout, freport)
       size_t crec;
 
       if (! freceive_data (qconn, sizeof (char), &crec, ctimeout, freport))
-	return -2;
+        return -2;
       if (crec == 0)
-	return -1;
+        return -1;
     }
 
   b = abPrecbuf[iPrecstart];
@@ -182,7 +182,7 @@ breceive_char (qconn, ctimeout, freport)
 
 boolean
 fmail_transfer (fsuccess, zuser, zmail, zwhy, zfromfile, zfromsys,
-		ztofile, ztosys, zsaved)
+                ztofile, ztosys, zsaved)
      boolean fsuccess;
      const char *zuser;
      const char *zmail;
@@ -235,6 +235,6 @@ fmail_transfer (fsuccess, zuser, zmail, zwhy, zfromfile, zfromsys,
     }
 
   return fsysdep_mail (zsendto,
-		       fsuccess ? "UUCP succeeded" : "UUCP failed",
-		       i, az);
+                       fsuccess ? "UUCP succeeded" : "UUCP failed",
+                       i, az);
 }

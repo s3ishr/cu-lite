@@ -446,6 +446,6 @@ extern unsigned long strtoul P((const char *, char **, int));
 /* Lookup a key in a sorted array.  */
 #if ! HAVE_BSEARCH
 extern pointer bsearch P((constpointer pkey, constpointer parray,
-			  size_t celes, size_t cbytes,
-			  int (*pficmp) P((constpointer, constpointer))));
+                          size_t celes, size_t cbytes,
+                          int (*pficmp) P((constpointer, constpointer))));
 #endif

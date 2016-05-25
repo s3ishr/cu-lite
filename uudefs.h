@@ -198,14 +198,14 @@ extern int iDebug;
   do \
     { \
       if (FDEBUGGING (i)) \
-	ulog (LOG_DEBUG, (z), (a1), (a2), (a3)); \
+        ulog (LOG_DEBUG, (z), (a1), (a2), (a3)); \
     } \
   while (0)
 #define DEBUG_MESSAGE4(i, z, a1, a2, a3, a4) \
   do \
     { \
       if (FDEBUGGING (i)) \
-	ulog (LOG_DEBUG, (z), (a1), (a2), (a3), (a4)); \
+        ulog (LOG_DEBUG, (z), (a1), (a2), (a3), (a4)); \
     } \
   while (0)
 
@@ -228,7 +228,7 @@ extern int iDebug;
    Otherwise, it translates the name as necessary for the spool
    directory, and fills in *qsys.  */
 extern boolean funknown_system P((pointer puuconf, const char *zsystem,
-				  struct uuconf_system *qsys));
+                                  struct uuconf_system *qsys));
 
 /* See whether a file belongs in the spool directory.  */
 extern boolean fspool_file P((const char *zfile));
@@ -237,13 +237,13 @@ extern boolean fspool_file P((const char *zfile));
    Otherwise, return TRUE and set *pival and *pcretry to the values
    from the matching element of the span.  */
 extern boolean ftimespan_match P((const struct uuconf_timespan *qspan,
-				  long *pival, int *pcretry));
+                                  long *pival, int *pcretry));
 
 /* Remove all occurrences of the local system name followed by an
    exclamation point from the start of the argument.  Return the
    possibly shortened argument.  */
 extern char *zremove_local_sys P((struct uuconf_system *qlocalsys,
-				  char *z));
+                                  char *z));
 
 /* Determine the maximum size that may ever be transferred, given a
    timesize span.  If there are any time gaps larger than 1 hour not
@@ -253,10 +253,10 @@ extern long cmax_size_ever P((const struct uuconf_timespan *qtimesize));
 
 /* Send mail about a file transfer.  */
 extern boolean fmail_transfer P((boolean fok, const char *zuser,
-				 const char *zmail, const char *zwhy,
-				 const char *zfrom, const char *zfromsys,
-				 const char *zto, const char *ztosys,
-				 const char *zsaved));
+                                 const char *zmail, const char *zwhy,
+                                 const char *zfrom, const char *zfromsys,
+                                 const char *zto, const char *ztosys,
+                                 const char *zsaved));
 
 /* See whether a file is in one of a list of directories.  The zpubdir
    argument is used to pass the directory names to zsysdep_local_file.
@@ -267,11 +267,11 @@ extern boolean fmail_transfer P((boolean fok, const char *zuser,
    argument may be NULL, in which case all users must have the
    appropriate access (this is used for a remote request).  */
 extern boolean fin_directory_list P((const char *zfile,
-				     char **pzdirs,
-				     const char *zpubdir,
-				     boolean fcheck,
-				     boolean freadable,
-				     const char *zuser));
+                                     char **pzdirs,
+                                     const char *zpubdir,
+                                     boolean fcheck,
+                                     boolean freadable,
+                                     const char *zuser));
 
 /* Parse a command string.  */
 extern boolean fparse_cmd P((char *zcmd, struct scmd *qcmd));
@@ -308,7 +308,7 @@ extern void ulog ();
 
 /* Report an error returned by one of the uuconf routines.  */
 extern void ulog_uuconf P((enum tlog ttype, pointer puuconf,
-			   int iuuconf));
+                           int iuuconf));
 
 /* Set the function to call if a fatal error occurs.  */
 extern void ulog_fatal_fn P((void (*pfn) P((void))));
@@ -334,9 +334,9 @@ extern void ulog_close P((void));
 
 /* Make an entry in the statistics file.  */
 extern void ustats P((boolean fsucceeded, const char *zuser,
-		      const char *zsystem, boolean fsent,
-		      long cbytes, long csecs, long cmicros,
-		      boolean fcaller));
+                      const char *zsystem, boolean fsent,
+                      long cbytes, long csecs, long cmicros,
+                      boolean fcaller));
 
 /* Close the statistics file.  */
 extern void ustats_close P((void));
@@ -346,7 +346,7 @@ extern void ustats_close P((void));
    buffer length clen, and the contents of the buffer in quotation
    marks.  */
 extern void udebug_buffer P((const char *zhdr, const char *zbuf,
-			     size_t clen));
+                             size_t clen));
 
 /* A debugging routine to make a readable version of a character.
    This takes a buffer at least 5 bytes long, and returns the length
@@ -362,13 +362,13 @@ extern int idebug_parse P((const char *));
 
 /* Copy one file to another.  */
 extern boolean fcopy_file P((const char *zfrom, const char *zto,
-			     boolean fpublic, boolean fmkdirs,
-			     boolean fsignals));
+                             boolean fpublic, boolean fmkdirs,
+                             boolean fsignals));
 
 /* Copy an open file to another.  */
 extern boolean fcopy_open_file P((openfile_t efrom, const char *zto,
-				  boolean fpublic, boolean fmkdirs,
-				  boolean fsignals));
+                                  boolean fpublic, boolean fmkdirs,
+                                  boolean fsignals));
 
 /* Translate escape sequences in a buffer, leaving the result in the
    same buffer and returning the length.  */

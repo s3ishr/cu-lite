@@ -21,7 +21,7 @@
 #ifndef _GETOPT_H
 #define _GETOPT_H 1
 
-#ifdef	__cplusplus
+#ifdef  __cplusplus
 extern "C" {
 #endif
 
@@ -66,9 +66,9 @@ extern int opterr;
    zero.
 
    The field `has_arg' is:
-   no_argument		(or 0) if the option does not take an argument,
-   required_argument	(or 1) if the option requires an argument,
-   optional_argument 	(or 2) if the option takes an optional argument.
+   no_argument          (or 0) if the option does not take an argument,
+   required_argument    (or 1) if the option requires an argument,
+   optional_argument    (or 2) if the option takes an optional argument.
 
    If the field `flag' is not NULL, it points to a variable that is set
    to the value given in the field `val' when the option is found, but
@@ -110,23 +110,23 @@ enum _argtype
 
 extern int getopt P((int argc, char *const *argv, const char *shortopts));
 extern int getopt_long P((int argc, char *const *argv, const char *shortopts,
-			  const struct option *longopts, int *longind));
+                          const struct option *longopts, int *longind));
 extern int getopt_long_only P((int argc, char *const *argv,
-			       const char *shortopts,
-			       const struct option *longopts, int *longind));
+                               const char *shortopts,
+                               const struct option *longopts, int *longind));
 
 /* Internal only.  Users should not call this directly.  */
 extern int _getopt_internal P((int argc, char *const *argv,
-			       const char *shortopts,
-			       const struct option *longopts, int *longind,
-			       int long_only));
+                               const char *shortopts,
+                               const struct option *longopts, int *longind,
+                               int long_only));
 
 #ifdef UNDEFINE_P
 #undef P
 #undef UNDEFINE_P
 #endif
 
-#ifdef	__cplusplus
+#ifdef  __cplusplus
 }
 #endif
 

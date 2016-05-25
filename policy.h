@@ -129,7 +129,7 @@
    resetting of CLOCAL to have no effect, so the "\m" (require
    carrier) escape sequence won't function properly in dialer chat
    scripts.  */
-#define	HAVE_CLOCAL_BUG	0
+#define HAVE_CLOCAL_BUG 0
 
 /* On some systems, such as SCO Xenix, resetting DTR on a port
    apparently prevents getty from working on the port, and thus

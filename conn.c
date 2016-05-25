@@ -129,19 +129,19 @@ fconn_open (qconn, ibaud, ihighbaud, fwait, fuser)
       char abspeed[20];
 
       if (ibaud == (long) 0)
-	strcpy (abspeed, "default speed");
+        strcpy (abspeed, "default speed");
       else
-	sprintf (abspeed, "speed %ld", ibaud);
+        sprintf (abspeed, "speed %ld", ibaud);
 
       if (qconn->qport == NULL)
-	ulog (LOG_DEBUG, "fconn_open: Opening stdin port (%s)",
-	      abspeed);
+        ulog (LOG_DEBUG, "fconn_open: Opening stdin port (%s)",
+              abspeed);
       else if (qconn->qport->uuconf_zname == NULL)
-	ulog (LOG_DEBUG, "fconn_open: Opening unnamed port (%s)",
-	      abspeed);
+        ulog (LOG_DEBUG, "fconn_open: Opening unnamed port (%s)",
+              abspeed);
       else
-	ulog (LOG_DEBUG, "fconn_open: Opening port %s (%s)",
-	      qconn->qport->uuconf_zname, abspeed);
+        ulog (LOG_DEBUG, "fconn_open: Opening port %s (%s)",
+              qconn->qport->uuconf_zname, abspeed);
     }
 #endif
 
@@ -154,20 +154,20 @@ fconn_open (qconn, ibaud, ihighbaud, fwait, fuser)
       qport = qconn->qport;
       ibaud = ihighbaud;
       if (qport->uuconf_ttype == UUCONF_PORTTYPE_MODEM)
-	{
-	  if (qport->uuconf_u.uuconf_smodem.uuconf_ilowbaud != 0)
-	    {
-	      if (qport->uuconf_u.uuconf_smodem.uuconf_ihighbaud < ibaud)
-		ibaud = qport->uuconf_u.uuconf_smodem.uuconf_ihighbaud;
-	    }
-	  else if (qport->uuconf_u.uuconf_smodem.uuconf_ibaud != 0)
-	    ibaud = qport->uuconf_u.uuconf_smodem.uuconf_ibaud;
-	}
+        {
+          if (qport->uuconf_u.uuconf_smodem.uuconf_ilowbaud != 0)
+            {
+              if (qport->uuconf_u.uuconf_smodem.uuconf_ihighbaud < ibaud)
+                ibaud = qport->uuconf_u.uuconf_smodem.uuconf_ihighbaud;
+            }
+          else if (qport->uuconf_u.uuconf_smodem.uuconf_ibaud != 0)
+            ibaud = qport->uuconf_u.uuconf_smodem.uuconf_ibaud;
+        }
       else if (qport->uuconf_ttype == UUCONF_PORTTYPE_DIRECT)
-	{
-	  if (qport->uuconf_u.uuconf_sdirect.uuconf_ibaud != 0)
-	    ibaud = qport->uuconf_u.uuconf_sdirect.uuconf_ibaud;
-	}
+        {
+          if (qport->uuconf_u.uuconf_sdirect.uuconf_ibaud != 0)
+            ibaud = qport->uuconf_u.uuconf_sdirect.uuconf_ibaud;
+        }
     }
 
   /* This will normally be overridden by the port specific open
@@ -228,8 +228,8 @@ fconn_dial (qconn, puuconf, qsys, zphone, qdialer, ptdialerfound)
   struct uuconf_dialer sdialer;
   enum tdialerfound tfound;
   boolean (*pfdial) P((struct sconnection *, pointer,
-		       const struct uuconf_system *, const char *,
-		       struct uuconf_dialer *, enum tdialerfound *));
+                       const struct uuconf_system *, const char *,
+                       struct uuconf_dialer *, enum tdialerfound *));
 
   if (qdialer == NULL)
     qdialer = &sdialer;
@@ -259,7 +259,7 @@ fconn_read (qconn, zbuf, pclen, cmin, ctimeout, freport)
   boolean fret;
 
   fret = (*qconn->qcmds->pfread) (qconn, zbuf, pclen, cmin, ctimeout,
-				  freport);
+                                  freport);
 
 #if DEBUG > 1
   if (FDEBUGGING (DEBUG_INCOMING))
@@ -306,7 +306,7 @@ fconn_io (qconn, zwrite, pcwrite, zread, pcread)
 
   if (cread == 0 || cwrite == 0)
     ulog (LOG_FATAL, "fconn_io: cread %lu; cwrite %lu",
-	  (unsigned long) cread, (unsigned long) cwrite);
+          (unsigned long) cread, (unsigned long) cwrite);
 #endif
 
 #if DEBUG > 1
@@ -317,9 +317,9 @@ fconn_io (qconn, zwrite, pcwrite, zread, pcread)
   fret = (*qconn->qcmds->pfio) (qconn, zwrite, pcwrite, zread, pcread);
 
   DEBUG_MESSAGE4 (DEBUG_PORT,
-		  "fconn_io: Wrote %lu of %lu, read %lu of %lu",
-		  (unsigned long) *pcwrite, (unsigned long) cwrite,
-		  (unsigned long) *pcread, (unsigned long) cread);
+                  "fconn_io: Wrote %lu of %lu, read %lu of %lu",
+                  (unsigned long) *pcwrite, (unsigned long) cwrite,
+                  (unsigned long) *pcread, (unsigned long) cread);
 
 #if DEBUG > 1
   if (*pcread > 0 && FDEBUGGING (DEBUG_INCOMING))
@@ -358,15 +358,15 @@ fconn_set (qconn, tparity, tstrip, txonxoff)
      enum txonxoffsetting txonxoff;
 {
   boolean (*pfset) P((struct sconnection *, enum tparitysetting,
-		      enum tstripsetting, enum txonxoffsetting));
+                      enum tstripsetting, enum txonxoffsetting));
 
   pfset = qconn->qcmds->pfset;
   if (pfset == NULL)
     return TRUE;
 
   DEBUG_MESSAGE3 (DEBUG_PORT,
-		  "fconn_set: Changing setting to %d, %d, %d",
-		  (int) tparity, (int) tstrip, (int) txonxoff);
+                  "fconn_set: Changing setting to %d, %d, %d",
+                  (int) tparity, (int) tstrip, (int) txonxoff);
 
   return (*pfset) (qconn, tparity, tstrip, txonxoff);
 }
@@ -423,7 +423,7 @@ iconn_baud (qconn)
 
 boolean
 fconn_dial_sequence (qconn, puuconf, pzdialer, qsys, zphone, qdialer,
-		     ptdialerfound)
+                     ptdialerfound)
      struct sconnection *qconn;
      pointer puuconf;
      char **pzdialer;
@@ -449,67 +449,67 @@ fconn_dial_sequence (qconn, puuconf, pzdialer, qsys, zphone, qdialer,
       boolean ftranslate;
 
       if (! ffirst)
-	q = &s;
+        q = &s;
       else
-	q = qdialer;
+        q = qdialer;
 
       if (! ffirst || *ptdialerfound == DIALERFOUND_FALSE)
-	{
-	  int iuuconf;
+        {
+          int iuuconf;
 
-	  iuuconf = uuconf_dialer_info (puuconf, *pzdialer, q);
-	  if (iuuconf == UUCONF_NOT_FOUND)
-	    {
-	      ulog (LOG_ERROR, "%s: Dialer not found", *pzdialer);
-	      if (ffreefirst)
-		(void) uuconf_dialer_free (puuconf, qdialer);
-	      return FALSE;
-	    }
-	  else if (iuuconf != UUCONF_SUCCESS)
-	    {
-	      ulog_uuconf (LOG_ERROR, puuconf, iuuconf);
-	      if (ffreefirst)
-		(void) uuconf_dialer_free (puuconf, qdialer);
-	      return FALSE;
-	    }
+          iuuconf = uuconf_dialer_info (puuconf, *pzdialer, q);
+          if (iuuconf == UUCONF_NOT_FOUND)
+            {
+              ulog (LOG_ERROR, "%s: Dialer not found", *pzdialer);
+              if (ffreefirst)
+                (void) uuconf_dialer_free (puuconf, qdialer);
+              return FALSE;
+            }
+          else if (iuuconf != UUCONF_SUCCESS)
+            {
+              ulog_uuconf (LOG_ERROR, puuconf, iuuconf);
+              if (ffreefirst)
+                (void) uuconf_dialer_free (puuconf, qdialer);
+              return FALSE;
+            }
 
-	  if (ffirst)
-	    {
-	      *ptdialerfound = DIALERFOUND_FREE;
-	      ffreefirst = TRUE;
-	    }
-	}
+          if (ffirst)
+            {
+              *ptdialerfound = DIALERFOUND_FREE;
+              ffreefirst = TRUE;
+            }
+        }
 
       ++pzdialer;
       ztoken = *pzdialer;
 
       ftranslate = FALSE;
       if (ztoken == NULL
-	  || strcmp (ztoken, "\\D") == 0)
-	ztoken = zphone;
+          || strcmp (ztoken, "\\D") == 0)
+        ztoken = zphone;
       else if (strcmp (ztoken, "\\T") == 0)
-	{
-	  ztoken = zphone;
-	  ftranslate = TRUE;
-	}
+        {
+          ztoken = zphone;
+          ftranslate = TRUE;
+        }
 
       if (! fchat (qconn, puuconf, &q->uuconf_schat, qsys, q, ztoken,
-		   ftranslate, zname, iconn_baud (qconn)))
-	{
-	  if (q == &s)
-	    (void) uuconf_dialer_free (puuconf, q);
-	  if (ffreefirst)
-	    (void) uuconf_dialer_free (puuconf, qdialer);
-	  return FALSE;
-	}
+                   ftranslate, zname, iconn_baud (qconn)))
+        {
+          if (q == &s)
+            (void) uuconf_dialer_free (puuconf, q);
+          if (ffreefirst)
+            (void) uuconf_dialer_free (puuconf, qdialer);
+          return FALSE;
+        }
 
       if (ffirst)
-	ffirst = FALSE;
+        ffirst = FALSE;
       else
-	(void) uuconf_dialer_free (puuconf, q);
+        (void) uuconf_dialer_free (puuconf, q);
 
       if (*pzdialer != NULL)
-	++pzdialer;
+        ++pzdialer;
     }
 
   return TRUE;
@@ -539,25 +539,25 @@ fmodem_dial (qconn, puuconf, qsys, zphone, qdialer, ptdialerfound)
 
       iuuconf = uuconf_dialer_info (puuconf, *pzdialer, qdialer);
       if (iuuconf == UUCONF_NOT_FOUND)
-	{
-	  ulog (LOG_ERROR, "%s: Dialer not found", *pzdialer);
-	  return FALSE;
-	}
+        {
+          ulog (LOG_ERROR, "%s: Dialer not found", *pzdialer);
+          return FALSE;
+        }
       else if (iuuconf != UUCONF_SUCCESS)
-	{
-	  ulog_uuconf (LOG_ERROR, puuconf, iuuconf);
-	  return FALSE;
-	}
+        {
+          ulog_uuconf (LOG_ERROR, puuconf, iuuconf);
+          return FALSE;
+        }
 
       *ptdialerfound = DIALERFOUND_FREE;
 
       fret = (fsysdep_modem_begin_dial (qconn, qdialer)
-	      && fconn_dial_sequence (qconn, puuconf, pzdialer, qsys, zphone,
-				      qdialer, ptdialerfound)
-	      && fsysdep_modem_end_dial (qconn, qdialer));
+              && fconn_dial_sequence (qconn, puuconf, pzdialer, qsys, zphone,
+                                      qdialer, ptdialerfound)
+              && fsysdep_modem_end_dial (qconn, qdialer));
 
       if (! fret)
-	(void) uuconf_dialer_free (puuconf, qdialer);
+        (void) uuconf_dialer_free (puuconf, qdialer);
 
       return fret;
     }
@@ -571,14 +571,14 @@ fmodem_dial (qconn, puuconf, qsys, zphone, qdialer, ptdialerfound)
       *ptdialerfound = DIALERFOUND_TRUE;
 
       if (qconn->qport == NULL)
-	zname = NULL;
+        zname = NULL;
       else
-	zname = qconn->qport->uuconf_zname;
+        zname = qconn->qport->uuconf_zname;
 
       return (fsysdep_modem_begin_dial (qconn, q)
-	      && fchat (qconn, puuconf, &q->uuconf_schat, qsys, q,
-			zphone, FALSE, zname, iconn_baud (qconn))
-	      && fsysdep_modem_end_dial (qconn, q));
+              && fchat (qconn, puuconf, &q->uuconf_schat, qsys, q,
+                        zphone, FALSE, zname, iconn_baud (qconn))
+              && fsysdep_modem_end_dial (qconn, q));
     }
   else
     {

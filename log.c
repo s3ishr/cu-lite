@@ -265,24 +265,24 @@ ulog (ttype, zmsg, a, b, c, d, f, g, h, i, j)
 
     if (! fdoing_sigs)
       {
-	int isig;
+        int isig;
 
-	fdoing_sigs = TRUE;
-	for (isig = 0; isig < INDEXSIG_COUNT; isig++)
-	  {
-	    if (afLog_signal[isig])
-	      {
-		afLog_signal[isig] = FALSE;
+        fdoing_sigs = TRUE;
+        for (isig = 0; isig < INDEXSIG_COUNT; isig++)
+          {
+            if (afLog_signal[isig])
+              {
+                afLog_signal[isig] = FALSE;
 
-		/* Apparently SunOS sends SIGINT rather than SIGHUP
-		   when hanging up, so we don't log either signal if
-		   fLog_sighup is FALSE.  */
-		if ((isig != INDEXSIG_SIGHUP && isig != INDEXSIG_SIGINT)
-		    || fLog_sighup)
-		  ulog (LOG_ERROR, "Got %s signal", azSignal_names[isig]);
-	      }
-	  }
-	fdoing_sigs = FALSE;
+                /* Apparently SunOS sends SIGINT rather than SIGHUP
+                   when hanging up, so we don't log either signal if
+                   fLog_sighup is FALSE.  */
+                if ((isig != INDEXSIG_SIGHUP && isig != INDEXSIG_SIGINT)
+                    || fLog_sighup)
+                  ulog (LOG_ERROR, "Got %s signal", azSignal_names[isig]);
+              }
+          }
+        fdoing_sigs = FALSE;
       }
   }
 
@@ -308,111 +308,111 @@ ulog (ttype, zmsg, a, b, c, d, f, g, h, i, j)
       e = eLdebug;
 
       /* If we can't open the debugging file, don't output any
-	 debugging messages.  */
+         debugging messages.  */
       if (e == NULL)
-	return;
+        return;
     }
 #endif /* DEBUG > 1 */
   else
     {
       if (eLlog == NULL && ! fLlog_tried)
-	{
-	  const char *zprint = NULL;
+        {
+          const char *zprint = NULL;
 
-	  fLlog_tried = TRUE;
+          fLlog_tried = TRUE;
 #if ! HAVE_HDB_LOGGING
-	  eLlog = esysdep_fopen (zLogfile, TRUE, TRUE, TRUE);
-	  zprint = zLogfile;
+          eLlog = esysdep_fopen (zLogfile, TRUE, TRUE, TRUE);
+          zprint = zLogfile;
 #else /* HAVE_HDB_LOGGING */
-	  {
-	    const char *zcheck;
-	    int cfmt;
-	    char *zfile;
+          {
+            const char *zcheck;
+            int cfmt;
+            char *zfile;
 
-	    /* Only run sprintf if there are no more than two
+            /* Only run sprintf if there are no more than two
                unadorned %s.  If we see any other formatting
                character, just use zLogfile as is.  This is to protect
                the UUCP administrator against foolishness.  Note that
                this has been reported as a security vulnerability, but
                it is not.  */
-	    cfmt = 0;
-	    for (zcheck = zLogfile; *zcheck != '\0'; ++zcheck)
-	      {
-		if (*zcheck == '%')
-		  {
-		    if (zcheck[1] == 's')
-		      ++cfmt;
-		    else
-		      {
-			cfmt = 3;
-			break;
-		      }
-		  }
-	      }
+            cfmt = 0;
+            for (zcheck = zLogfile; *zcheck != '\0'; ++zcheck)
+              {
+                if (*zcheck == '%')
+                  {
+                    if (zcheck[1] == 's')
+                      ++cfmt;
+                    else
+                      {
+                        cfmt = 3;
+                        break;
+                      }
+                  }
+              }
 
-	    if (cfmt > 2)
-	      zfile = zbufcpy (zLogfile);
-	    else
-	      {
-		const char *zsys;
-		char *zbase;
-		char *zlower;
+            if (cfmt > 2)
+              zfile = zbufcpy (zLogfile);
+            else
+              {
+                const char *zsys;
+                char *zbase;
+                char *zlower;
 
-		/* We want to write to .Log/program/system, e.g.
-		   .Log/uucico/uunet.  The system name may not be set.  */
-		if (zLsystem == NULL)
-		  zsys = "ANY";
-		else
-		  zsys = zLsystem;
+                /* We want to write to .Log/program/system, e.g.
+                   .Log/uucico/uunet.  The system name may not be set.  */
+                if (zLsystem == NULL)
+                  zsys = "ANY";
+                else
+                  zsys = zLsystem;
 
-		zbase = zsysdep_base_name (zProgram);
-		if (zbase == NULL)
-		  zbase = zbufcpy (zProgram);
+                zbase = zsysdep_base_name (zProgram);
+                if (zbase == NULL)
+                  zbase = zbufcpy (zProgram);
 
-		/* On some systems the native uusched will invoke
-		   uucico with an upper case argv[0].  We work around
-		   that by forcing the filename to lower case here.  */
-		for (zlower = zbase; *zlower != '\0'; zlower++)
-		  if (isupper (*zlower))
-		    *zlower = tolower (*zlower);
+                /* On some systems the native uusched will invoke
+                   uucico with an upper case argv[0].  We work around
+                   that by forcing the filename to lower case here.  */
+                for (zlower = zbase; *zlower != '\0'; zlower++)
+                  if (isupper (*zlower))
+                    *zlower = tolower (*zlower);
 
-		zfile = zbufalc (strlen (zLogfile)
-				 + strlen (zbase)
-				 + strlen (zsys)
-				 + 1);
-		sprintf (zfile, zLogfile, zbase, zsys);
-		ubuffree (zbase);
-	      }
+                zfile = zbufalc (strlen (zLogfile)
+                                 + strlen (zbase)
+                                 + strlen (zsys)
+                                 + 1);
+                sprintf (zfile, zLogfile, zbase, zsys);
+                ubuffree (zbase);
+              }
 
-	    eLlog = esysdep_fopen (zfile, TRUE, TRUE, TRUE);
-	    if (eLlog != NULL)
-	      ubuffree (zfile);
-	    else
-	      zprint = zfile;
-	  }
+            eLlog = esysdep_fopen (zfile, TRUE, TRUE, TRUE);
+            if (eLlog != NULL)
+              ubuffree (zfile);
+            else
+              zprint = zfile;
+          }
 #endif /* HAVE_HDB_LOGGING */
 
-	  if (eLlog == NULL)
-	    {
-	      /* We can't open the log file.  We report the problem to
-		 stderr.  This is not ideal, since if this is uucico
-		 running on an inbound call stderr is actually
-		 connected to a remote system, but is better than
-		 doing nothing.  */
-	      fprintf (stderr, "%s: %s: can not open log file: %s\n",
-		       zProgram, zprint, strerror (errno));
-	      if (pfLfatal != NULL)
-		(*pfLfatal) ();
-	      usysdep_exit (FALSE);
-	    }
-	}
+          if (eLlog == NULL)
+            {
+              /* We can't open the log file.  We report the problem to
+                 stderr.  This is not ideal, since if this is uucico
+                 running on an inbound call stderr is actually
+                 connected to a remote system, but is better than
+                 doing nothing.  */
+              fprintf (stderr, "%s: %s: can not open log file: %s\n",
+                       zProgram, zprint, strerror (errno));
+              if (pfLfatal != NULL)
+                (*pfLfatal) ();
+              usysdep_exit (FALSE);
+            }
+        }
 
       e = eLlog;
 
       /* eLlog might be NULL here because we might try to open the log
-	 file recursively via esysdep_fopen.  */
+         file recursively via esysdep_fopen.  */
       if (e == NULL)
-	return;
+        return;
     }
 
   if (zmsg == NULL)
@@ -469,77 +469,77 @@ ulog (ttype, zmsg, a, b, c, d, f, g, h, i, j)
   else
     {
       if (! fLfile)
-	{
-	  zprefix = zbufalc (strlen (zProgram) + 3);
-	  sprintf (zprefix, "%s: ", zProgram);
-	}
+        {
+          zprefix = zbufalc (strlen (zProgram) + 3);
+          sprintf (zprefix, "%s: ", zProgram);
+        }
       else
-	{
-	  zprefix = zbufalc (strlen (zProgram)
-			     + (zLsystem == NULL ? 1 : strlen (zLsystem))
-			     + (zLuser == NULL ? 4 : strlen (zLuser))
-			     + sizeof "1991-12-31 12:00:00.00"
-			     + strlen (zhdr)
-			     + 100);
-	  zset = zprefix;
+        {
+          zprefix = zbufalc (strlen (zProgram)
+                             + (zLsystem == NULL ? 1 : strlen (zLsystem))
+                             + (zLuser == NULL ? 4 : strlen (zLuser))
+                             + sizeof "1991-12-31 12:00:00.00"
+                             + strlen (zhdr)
+                             + 100);
+          zset = zprefix;
 #if HAVE_TAYLOR_LOGGING
-	  {
-	    char *zbase;
+          {
+            char *zbase;
 
-	    zbase = zsysdep_base_name (zProgram);
-	    if (zbase == NULL)
-	      zbase = zbufcpy (zProgram);
-	    zset = zstpcpy (zset, zbase);
-	    *zset++ = ' ';
-	    ubuffree (zbase);
-	  }
+            zbase = zsysdep_base_name (zProgram);
+            if (zbase == NULL)
+              zbase = zbufcpy (zProgram);
+            zset = zstpcpy (zset, zbase);
+            *zset++ = ' ';
+            ubuffree (zbase);
+          }
 #else /* ! HAVE_TAYLOR_LOGGING */
-	  zset = zstpcpy (zset, zLuser == NULL ? "uucp" : zLuser);
-	  *zset++ = ' ';
+          zset = zstpcpy (zset, zLuser == NULL ? "uucp" : zLuser);
+          *zset++ = ' ';
 #endif /* HAVE_TAYLOR_LOGGING */
 
-	  zset = zstpcpy (zset, zLsystem == NULL ? "-" : zLsystem);
-	  *zset++ = ' ';
+          zset = zstpcpy (zset, zLsystem == NULL ? "-" : zLsystem);
+          *zset++ = ' ';
 
 #if HAVE_TAYLOR_LOGGING
-	  zset = zstpcpy (zset, zLuser == NULL ? "-" : zLuser);
-	  *zset++ = ' ';
+          zset = zstpcpy (zset, zLuser == NULL ? "-" : zLuser);
+          *zset++ = ' ';
 #endif /* HAVE_TAYLOR_LOGGING */
 
-	  *zset++ = '(';
-	  zset = zstpcpy (zset, zldate_and_time ());
+          *zset++ = '(';
+          zset = zstpcpy (zset, zldate_and_time ());
 
-	  if (iLid != 0)
-	    {
+          if (iLid != 0)
+            {
 #if ! HAVE_HDB_LOGGING
 #if HAVE_TAYLOR_LOGGING
-	      sprintf (zset, " %d", iLid);
+              sprintf (zset, " %d", iLid);
 #else /* ! HAVE_TAYLOR_LOGGING */
-	      sprintf (zset, "-%d", iLid);
+              sprintf (zset, "-%d", iLid);
 #endif /* ! HAVE_TAYLOR_LOGGING */
 #else /* HAVE_HDB_LOGGING */
-	      /* I assume that the second number here is meant to be
-		 some sort of file sequence number, and that it should
-		 correspond to the sequence number in the statistics
-		 file.  I don't have any really convenient way to do
-		 this, so I won't unless somebody thinks it's very
-		 important.  */
-	      sprintf (zset, ",%d,%d", iLid, 0);
+              /* I assume that the second number here is meant to be
+                 some sort of file sequence number, and that it should
+                 correspond to the sequence number in the statistics
+                 file.  I don't have any really convenient way to do
+                 this, so I won't unless somebody thinks it's very
+                 important.  */
+              sprintf (zset, ",%d,%d", iLid, 0);
 #endif /* HAVE_HDB_LOGGING */
 
-	      zset += strlen (zset);
-	    }
+              zset += strlen (zset);
+            }
 
 #if QNX_LOG_NODE_ID
-	  sprintf (zset, " %ld", (long) getnid ());
-	  zset += strlen (zset);
+          sprintf (zset, " %ld", (long) getnid ());
+          zset += strlen (zset);
 #endif
 
-	  *zset++ = ')';
-	  *zset++ = ' ';
+          *zset++ = ')';
+          *zset++ = ' ';
 
-	  strcpy (zset, zhdr);
-	}
+          strcpy (zset, zhdr);
+        }
     }
 
   zformat = zbufalc (2 * strlen (zprefix) + strlen (zmsg) + 2);
@@ -549,7 +549,7 @@ ulog (ttype, zmsg, a, b, c, d, f, g, h, i, j)
   while (*zfrom != '\0')
     {
       if (*zfrom == '%')
-	*zset++ = '%';
+        *zset++ = '%';
       *zset++ = *zfrom++;
     }
 
@@ -591,7 +591,7 @@ ulog (ttype, zmsg, a, b, c, d, f, g, h, i, j)
   if (ttype == LOG_FATAL)
     {
       if (pfLfatal != NULL)
-	(*pfLfatal) ();
+        (*pfLfatal) ();
       usysdep_exit (FALSE);
     }
 
@@ -679,50 +679,50 @@ ustats (fsucceeded, zuser, zsystem, fsent, cbytes, csecs, cmicros, fcaller)
       long cmillis, cdiv, crem;
 
       /* Compute ((csecs * 1000) / cmillis) using integer division.
-	 Where DIV is integer division, we know
-	     a = (a DIV b) * b + a % b
-	 so
-	     a / b = (a DIV b) + (a % b) / b
-	 We compute the latter with a as csecs and b as cmillis,
-	 mixing the multiplication by 1000.  */
+         Where DIV is integer division, we know
+             a = (a DIV b) * b + a % b
+         so
+             a / b = (a DIV b) + (a % b) / b
+         We compute the latter with a as csecs and b as cmillis,
+         mixing the multiplication by 1000.  */
       cmillis = csecs * 1000 + cmicros / 1000;
       cdiv = (cbytes / cmillis) * 1000;
       crem = (cbytes % cmillis) * 1000;
       cbps = cdiv + (crem / cmillis);
       if (cmillis < 0 || cdiv < 0 || crem < 0 || cbps < 0)
-	{
-	  /* We overflowed using milliseconds, so use seconds.  */
-	  cbps = cbytes / (csecs + ((cmicros > 500000L) ? 1 : 0));
-	}
+        {
+          /* We overflowed using milliseconds, so use seconds.  */
+          cbps = cbytes / (csecs + ((cmicros > 500000L) ? 1 : 0));
+        }
     }
 
   if (eLstats == NULL)
     {
       if (fLstats_tried)
-	return;
+        return;
       fLstats_tried = TRUE;
       eLstats = esysdep_fopen (zLstatsfile, TRUE, TRUE, TRUE);
       if (eLstats == NULL)
-	return;
+        return;
     }
 
 #if HAVE_TAYLOR_LOGGING
   fprintf (eLstats,
-	   "%s %s (%s) %s%s %ld bytes in %ld.%03ld seconds (%ld bytes/sec) on port %s\n",
-	   zuser, zsystem, zldate_and_time (),
-	   fsucceeded ? "" : "failed after ",
-	   fsent ? "sent" : "received",
-	   cbytes, csecs, cmicros / 1000, cbps,
-	   zLdevice == NULL ? "unknown" : zLdevice);
+           "%s %s (%s) %s%s %ld bytes in %ld.%03ld seconds (%ld bytes/sec) on port %s\n",
+           zuser, zsystem, zldate_and_time (),
+           fsucceeded ? "" : "failed after ",
+           fsent ? "sent" : "received",
+           cbytes, csecs, cmicros / 1000, cbps,
+           zLdevice == NULL ? "unknown" : zLdevice);
 #endif /* HAVE_TAYLOR_LOGGING */
 #if HAVE_V2_LOGGING
   fprintf (eLstats,
-	   "%s %s (%s) (%ld) %s %s %ld bytes %ld seconds\n",
-	   zuser, zsystem, zldate_and_time (),
-	   (long) time ((time_t *) NULL),
-	   fsent ? "sent" : "received",
-	   fsucceeded ? "data" : "failed after",
-	   cbytes, csecs + cmicros / 500000);
+           "%s %s (%s) (%ld) %s %s %ld bytes %ld seconds\n",
+           zuser, zsystem, zldate_and_time (),
+           (long) time ((time_t *) NULL),
+           fsent ? "sent" : "received",
+           fsucceeded ? "data" : "failed after",
+           cbytes, csecs + cmicros / 500000);
 #endif /* HAVE_V2_LOGGING */
 #if HAVE_HDB_LOGGING
   {
@@ -735,13 +735,13 @@ ustats (fsucceeded, zuser, zsystem, fsent, cbytes, csecs, cmicros, fcaller)
        calls.  */
     ++iseq;
     fprintf (eLstats,
-	     "%s!%s %c (%s) (C,%d,%d) [%s] %s %ld / %ld.%03ld secs, %ld%s%s\n",
-	     zsystem, zuser, fcaller ? 'M' : 'S', zldate_and_time (),
-	     iLid, iseq, zLdevice == NULL ? "unknown" : zLdevice,
-	     fsent ? "->" : "<-",
-	     cbytes, csecs, cmicros / 1000, cbps,
-	     " bytes/sec",
-	     fsucceeded ? "" : " [PARTIAL FILE]");
+             "%s!%s %c (%s) (C,%d,%d) [%s] %s %ld / %ld.%03ld secs, %ld%s%s\n",
+             zsystem, zuser, fcaller ? 'M' : 'S', zldate_and_time (),
+             iLid, iseq, zLdevice == NULL ? "unknown" : zLdevice,
+             fsent ? "->" : "<-",
+             cbytes, csecs, cmicros / 1000, cbps,
+             " bytes/sec",
+             fsucceeded ? "" : " [PARTIAL FILE]");
   }
 #endif /* HAVE_HDB_LOGGING */
 
@@ -760,7 +760,7 @@ ustats_close ()
   if (eLstats != NULL)
     {
       if (fclose (eLstats) != 0)
-	ulog (LOG_ERROR, "fclose: %s", strerror (errno));
+        ulog (LOG_ERROR, "fclose: %s", strerror (errno));
       eLstats = NULL;
       fLstats_tried = FALSE;
     }
@@ -788,16 +788,16 @@ zldate_and_time ()
 
 #if HAVE_TAYLOR_LOGGING
   sprintf (ab, "%04d-%02d-%02d %02d:%02d:%02d.%02d",
-	   s.tm_year + 1900, s.tm_mon + 1, s.tm_mday, s.tm_hour,
-	   s.tm_min, s.tm_sec, (int) (imicros / 10000));
+           s.tm_year + 1900, s.tm_mon + 1, s.tm_mday, s.tm_hour,
+           s.tm_min, s.tm_sec, (int) (imicros / 10000));
 #endif
 #if HAVE_V2_LOGGING
   sprintf (ab, "%d/%d-%02d:%02d", s.tm_mon + 1, s.tm_mday,
-	   s.tm_hour, s.tm_min);
+           s.tm_hour, s.tm_min);
 #endif
 #if HAVE_HDB_LOGGING
   sprintf (ab, "%d/%d-%d:%02d:%02d", s.tm_mon + 1, s.tm_mday,
-	   s.tm_hour, s.tm_min, s.tm_sec);
+           s.tm_hour, s.tm_min, s.tm_sec);
 #endif
 
   return ab;

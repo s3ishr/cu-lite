@@ -731,8 +731,8 @@ struct uuconf_config_file_names
    setgid (getgid ())).  Otherwise various sorts of spoofing become
    possible.  */
 extern int uuconf_init (void **uuconf_ppglobal,
-			const char *uuconf_zprogram,
-			const char *uuconf_zname);
+                        const char *uuconf_zprogram,
+                        const char *uuconf_zname);
 
 /* Adjust the configuration file global pointer for a new thread.  The
    library is fully reentrant (with the exception of the function
@@ -751,15 +751,15 @@ extern int uuconf_init_thread (void **uuconf_ppglobal);
    are no longer needed.  If the falias argument is 0, the list will
    not include any aliases; otherwise, it will.  */
 extern int uuconf_system_names (void *uuconf_pglobal,
-				char ***uuconf_ppzsystems,
-				int uuconf_falias);
+                                char ***uuconf_ppzsystems,
+                                int uuconf_falias);
 
 /* Get the information for the system zsystem.  This sets the fields
    in *qsys.  This will work whether zsystem is the official name of
    the system or merely an alias.  */
 extern int uuconf_system_info (void *uuconf_pglobal,
-			       const char *uuconf_zsystem,
-			       struct uuconf_system *uuconf_qsys);
+                               const char *uuconf_zsystem,
+                               struct uuconf_system *uuconf_qsys);
 
 /* Get information for an unknown (anonymous) system.  The
    uuconf_zname field of the returned system information will be NULL.
@@ -767,7 +767,7 @@ extern int uuconf_system_info (void *uuconf_pglobal,
    return UUCONF_NOT_FOUND.  This does not run the HDB remote.unknown
    shell script.  */
 extern int uuconf_system_unknown (void *uuconf_pglobal,
-				  struct uuconf_system *uuconf_qsys);
+                                  struct uuconf_system *uuconf_qsys);
 
 /* Get information for the local system.  Normally the local system
    name should first be looked up using uuconf_system_info.  If that
@@ -775,7 +775,7 @@ extern int uuconf_system_unknown (void *uuconf_pglobal,
    appropriate set of defaults.  The uuconf_zname field of the
    returned system information may be NULL.  */
 extern int uuconf_system_local (void *uuconf_pglobal,
-				struct uuconf_system *uuconf_qsys);
+                                struct uuconf_system *uuconf_qsys);
 
 /* Free the memory occupied by system information returned by
    uuconf_system_info, uuconf_system_unknown, uuconf_system_local, or
@@ -783,7 +783,7 @@ extern int uuconf_system_local (void *uuconf_pglobal,
    below.  After this is called, the contents of the structure shall
    not be referred to.  */
 extern int uuconf_system_free (void *uuconf_pglobal,
-			       struct uuconf_system *uuconf_qsys);
+                               struct uuconf_system *uuconf_qsys);
 
 #ifdef __OPTIMIZE__
 #define uuconf_system_free(qglob, q) \
@@ -819,20 +819,20 @@ extern int uuconf_system_free (void *uuconf_pglobal,
    If the port matches, the information is set into uuconf_qport, and
    uuconf_find_port returns UUCONF_SUCCESS.  */
 extern int uuconf_find_port (void *uuconf_pglobal,
-			     const char *uuconf_zname,
-			     long uuconf_ibaud,
-			     long uuconf_ihighbaud,
-			     int (*uuconf_pifn) (struct uuconf_port *,
-						 void *uuconf_pinfo),
-			     void *uuconf_pinfo,
-			     struct uuconf_port *uuconf_qport);
+                             const char *uuconf_zname,
+                             long uuconf_ibaud,
+                             long uuconf_ihighbaud,
+                             int (*uuconf_pifn) (struct uuconf_port *,
+                                                 void *uuconf_pinfo),
+                             void *uuconf_pinfo,
+                             struct uuconf_port *uuconf_qport);
 
 /* Free the memory occupied by system information returned by
    uuconf_find_port (or any of the configuration file specific
    routines described below).  After this is called, the contents of
    the structure shall not be referred to.  */
 extern int uuconf_port_free (void *uuconf_pglobal,
-			     struct uuconf_port *uuconf_qport);
+                             struct uuconf_port *uuconf_qport);
 
 #ifdef __OPTIMIZE__
 #define uuconf_port_free(qglob, q) \
@@ -845,20 +845,20 @@ extern int uuconf_port_free (void *uuconf_pglobal,
    element of the array, and they may all be passed to free when they
    are no longer needed.  */
 extern int uuconf_dialer_names (void *uuconf_pglobal,
-				char ***uuconf_ppzdialers);
+                                char ***uuconf_ppzdialers);
 
 /* Get the information for the dialer zdialer.  This sets the fields
    in *qdialer.  */
 extern int uuconf_dialer_info (void *uuconf_pglobal,
-			       const char *uuconf_zdialer,
-			       struct uuconf_dialer *uuconf_qdialer);
+                               const char *uuconf_zdialer,
+                               struct uuconf_dialer *uuconf_qdialer);
 
 /* Free the memory occupied by system information returned by
    uuconf_dialer_info (or any of the configuration file specific
    routines described below).  After this is called, the contents of
    the structure shall not be referred to.  */
 extern int uuconf_dialer_free (void *uuconf_pglobal,
-			       struct uuconf_dialer *uuconf_qsys);
+                               struct uuconf_dialer *uuconf_qsys);
 
 #ifdef __OPTIMIZE__
 #define uuconf_dialer_free(qglob, q) \
@@ -868,7 +868,7 @@ extern int uuconf_dialer_free (void *uuconf_pglobal,
 /* Get the configuration file names.  The fields in the returned
    struct should not be freed.  */
 extern int uuconf_config_files (void *uuconf_pglobal,
-				struct uuconf_config_file_names* uuconf_names);
+                                struct uuconf_config_file_names* uuconf_names);
 
 /* Get the local node name.  If the node name is not specified
    (because no ``nodename'' command appeared in the config file) this
@@ -876,7 +876,7 @@ extern int uuconf_config_files (void *uuconf_pglobal,
    must be used to determine the node name.  Otherwise it will return
    a pointer to a constant string, which should not be freed.  */
 extern int uuconf_localname (void *uuconf_pglobal,
-			     const char **pzname);
+                             const char **pzname);
 
 /* Get the local node name that should be used, given a login name.
    This function will check for any special local name that may be
@@ -889,63 +889,63 @@ extern int uuconf_localname (void *uuconf_pglobal,
    function returns UUCONF_SUCCESS, *pzname will be point to an
    malloced buffer.  */
 extern int uuconf_login_localname (void *uuconf_pglobal,
-				   const char *uuconf_zlogin,
-				   char **pzname);
+                                   const char *uuconf_zlogin,
+                                   char **pzname);
 
 /* Get the name of the UUCP spool directory.  This will set *pzspool
    to a constant string, which should not be freed.  */
 extern int uuconf_spooldir (void *uuconf_pglobal,
-			    const char **uuconf_pzspool);
+                            const char **uuconf_pzspool);
 
 /* Get the name of the default UUCP public directory.  This will set
    *pzpub to a constant string, which should not be freed.  Note that
    particular systems may use a different public directory.  */
 extern int uuconf_pubdir (void *uuconf_pglobal,
-			  const char **uuconf_pzpub);
+                          const char **uuconf_pzpub);
 
 /* Get the name of the UUCP lock directory.  This will set *pzlock to
    a constant string, which should not be freed.  */
 extern int uuconf_lockdir (void *uuconf_pglobal,
-			   const char **uuconf_pzlock);
+                           const char **uuconf_pzlock);
 
 /* Get the name of the UUCP log file.  This will set *pzlog to a
    constant string, which should not be freed.  */
 extern int uuconf_logfile (void *uuconf_pglobal,
-			   const char **uuconf_pzlog);
+                           const char **uuconf_pzlog);
 
 /* Get the name of the UUCP statistics file.  This will set *pzstats
    to a constant string, which should not be freed.  */
 extern int uuconf_statsfile (void *uuconf_pglobal,
-			     const char **uuconf_pzstats);
+                             const char **uuconf_pzstats);
 
 /* Get the name of the UUCP debugging file.  This will set *pzdebug to
    a constant string, which should not be freed.  */
 extern int uuconf_debugfile (void *uuconf_pglobal,
-			     const char **uuconf_pzdebug);
+                             const char **uuconf_pzdebug);
 
 /* Get the default debugging level to use.  This basically gets the
    argument of the ``debug'' command from the Taylor UUCP config file.
    It will set *pzdebug to a constant string, which should not be
    freed.  */
 extern int uuconf_debuglevel (void *uuconf_pglobal,
-			      const char **uuconf_pzdebug);
+                              const char **uuconf_pzdebug);
 
 /* Get a combination of UUCONF_STRIP bits indicating what types of
    global information should be stripped on input.  */
 extern int uuconf_strip (void *uuconf_pglobal,
-			 int *uuconf_pistrip);
+                         int *uuconf_pistrip);
 
 /* Get the maximum number of simultaneous uuxqt executions.  This will
    set *pcmaxuuxqt to the number.  Zero indicates no maximum.  */
 extern int uuconf_maxuuxqts (void *uuconf_pglobal,
-			     int *uuconf_pcmaxuuxqt);
+                             int *uuconf_pcmaxuuxqt);
 
 /* Get the frequency with which to spawn a uuxqt process.  This
    returns an integer.  A positive number is the number of execution
    files that should be received between spawns.  Other values are one
    of the UUCONF_RUNUUXQT constants listed above.  */
 extern int uuconf_runuuxqt (void *uuconf_pglobal,
-			    int *uuconf_pirunuuxqt);
+                            int *uuconf_pirunuuxqt);
 
 /* Check a login name and password.  This checks the Taylor UUCP
    password file (not /etc/passwd).  It will work even if
@@ -961,25 +961,25 @@ extern int uuconf_runuuxqt (void *uuconf_pglobal,
    found, or the password does not compare correctly, uuconf_callin
    will return UUCONF_NOT_FOUND.  Other errors are also possible.  */
 extern int uuconf_callin (void *uuconf_pglobal,
-			  int (*uuconf_cmp) (int, void *, const char *),
-			  void *uuconf_pinfo);
+                          int (*uuconf_cmp) (int, void *, const char *),
+                          void *uuconf_pinfo);
 
 /* Get the callout login name and password for a system.  This will
    set both *pzlog and *pzpass to a string allocated by malloc, or to
    NULL if the value is not found.  If neither value is found, the
    function will return UUCONF_NOT_FOUND.  */
 extern int uuconf_callout (void *uuconf_pglobal,
-			   const struct uuconf_system *uuconf_qsys,
-			   char **uuconf_pzlog,
-			   char **uuconf_pzpass);
+                           const struct uuconf_system *uuconf_qsys,
+                           char **uuconf_pzlog,
+                           char **uuconf_pzpass);
 
 /* See if a login name is permitted for a system.  This will return
    UUCONF_SUCCESS if it is permitted or UUCONF_NOT_FOUND if it is
    invalid.  This simply calls uuconf_taylor_validate or returns
    UUCONF_SUCCESS, depending on the value of HAVE_TAYLOR_CONFIG.  */
 extern int uuconf_validate (void *uuconf_pglobal,
-			    const struct uuconf_system *uuconf_qsys,
-			    const char *uuconf_zlogin);
+                            const struct uuconf_system *uuconf_qsys,
+                            const char *uuconf_zlogin);
 
 /* Get the name of the HDB remote.unknown shell script, if using
    HAVE_HDB_CONFIG.  This does not actually run the shell script.  If
@@ -987,14 +987,14 @@ extern int uuconf_validate (void *uuconf_pglobal,
    which will point to an malloced buffer.  If it returns
    UUCONF_NOT_FOUND, then there is no script to run.  */
 extern int uuconf_remote_unknown (void *uuconf_pglobal,
-				  char **pzname);
+                                  char **pzname);
 
 /* Translate a dial code.  This sets *pznum to an malloced string.
    This will look up the entire zdial string in the dialcode file, so
    for normal use the alphabetic prefix should be separated.  */
 extern int uuconf_dialcode (void *uuconf_pglobal,
-			    const char *uuconf_zdial,
-			    char **uuconf_pznum);
+                            const char *uuconf_zdial,
+                            char **uuconf_pznum);
 
 /* Compare two grades, returning < 0 if b1 should be executed before
    b2, == 0 if they are the same, or > 0 if b1 should be executed
@@ -1065,8 +1065,8 @@ extern int uuconf_grade_cmp ();
    setgid (getgid ())).  Otherwise various sorts of spoofing become
    possible.  */
 extern int uuconf_taylor_init (void **uuconf_pglobal,
-			       const char *uuconf_zprogram,
-			       const char *uuconf_zname);
+                               const char *uuconf_zprogram,
+                               const char *uuconf_zname);
 
 /* Get the names of all systems listed in the Taylor UUCP
    configuration files.  This sets *ppzsystems to point to an array of
@@ -1075,54 +1075,54 @@ extern int uuconf_taylor_init (void **uuconf_pglobal,
    falias argument is 0, the list will not include any aliases;
    otherwise, it will.  */
 extern int uuconf_taylor_system_names (void *uuconf_pglobal,
-				       char ***uuconf_ppzsystems,
-				       int uuconf_falias);
+                                       char ***uuconf_ppzsystems,
+                                       int uuconf_falias);
 
 /* Get the information for system zsystem from the Taylor UUCP
    configuration files.  This will set *qsys.   */
 extern int uuconf_taylor_system_info (void *uuconf_pglobal,
-				      const char *uuconf_zsystem,
-				      struct uuconf_system *uuconf_qsys);
+                                      const char *uuconf_zsystem,
+                                      struct uuconf_system *uuconf_qsys);
 
 /* Get information for an unknown (anonymous) system.  This returns
    the values set by the ``unknown'' command in the main configuration
    file.  If the ``unknown'' command was not used, this will return
    UUCONF_NOT_FOUND.  */
 extern int uuconf_taylor_system_unknown (void *uuconf_pglobal,
-					 struct uuconf_system *uuconf_qsys);
+                                         struct uuconf_system *uuconf_qsys);
 
 /* Find a port from the Taylor UUCP configuration files.  The
    arguments and return values are identical to those of
    uuconf_find_port.  */
 extern int uuconf_taylor_find_port (void *uuconf_pglobal,
-				    const char *uuconf_zname,
-				    long uuconf_ibaud,
-				    long uuconf_ihighbaud,
-				    int (*uuconf_pifn) (struct uuconf_port *,
-							void *uuconf_pinfo),
-				    void *uuconf_pinfo,
-				    struct uuconf_port *uuconf_qport);
+                                    const char *uuconf_zname,
+                                    long uuconf_ibaud,
+                                    long uuconf_ihighbaud,
+                                    int (*uuconf_pifn) (struct uuconf_port *,
+                                                        void *uuconf_pinfo),
+                                    void *uuconf_pinfo,
+                                    struct uuconf_port *uuconf_qport);
 
 /* Get the names of all dialers listed in the Taylor UUCP
    configuration files.  This sets *ppzdialers to point to an array of
    dialer names.  The list of names is NULL terminated.  The array is
    allocated using malloc, as is each element of the array.  */
 extern int uuconf_taylor_dialer_names (void *uuconf_pglobal,
-				       char ***uuconf_ppzdialers);
+                                       char ***uuconf_ppzdialers);
 
 /* Get the information for the dialer zdialer from the Taylor UUCP
    configuration files.  This sets the fields in *qdialer.  */
 extern int uuconf_taylor_dialer_info (void *uuconf_pglobal,
-				      const char *uuconf_zdialer,
-				      struct uuconf_dialer *uuconf_qdialer);
+                                      const char *uuconf_zdialer,
+                                      struct uuconf_dialer *uuconf_qdialer);
 
 /* Get the local node name that should be used, given a login name,
    considering only the ``myname'' command in the Taylor UUCP
    configuration files.  If the function returns UUCONF_SUCCESS,
    *pzname will point to an malloced buffer.  */
 extern int uuconf_taylor_login_localname (void *uuconf_pglobal,
-					  const char *uuconf_zlogin,
-					  char **pzname);
+                                          const char *uuconf_zlogin,
+                                          char **pzname);
 
 /* Get the callout login name and password for a system from the
    Taylor UUCP configuration files.  This will set both *pzlog and
@@ -1130,9 +1130,9 @@ extern int uuconf_taylor_login_localname (void *uuconf_pglobal,
    not found.  If neither value is found, the function will return
    UUCONF_NOT_FOUND.  */
 extern int uuconf_taylor_callout (void *uuconf_pglobal,
-				  const struct uuconf_system *uuconf_qsys,
-				  char **uuconf_pzlog,
-				  char **uuconf_pzpass);
+                                  const struct uuconf_system *uuconf_qsys,
+                                  char **uuconf_pzlog,
+                                  char **uuconf_pzpass);
 
 /* See if a login name is permitted for a system.  This will return
    UUCONF_SUCCESS if it is permitted or UUCONF_NOT_FOUND if it is
@@ -1140,8 +1140,8 @@ extern int uuconf_taylor_callout (void *uuconf_pglobal,
    called-login command with a list of system which does not include
    the system qsys.  */
 extern int uuconf_taylor_validate (void *uuconf_pglobal,
-				   const struct uuconf_system *uuconf_qsys,
-				   const char *uuconf_zlogin);
+                                   const struct uuconf_system *uuconf_qsys,
+                                   const char *uuconf_zlogin);
 
 #else /* ! UUCONF_ANSI_C */
 
@@ -1174,25 +1174,25 @@ extern int uuconf_v2_init (void **uuconf_ppglobal);
    malloc, as is each element of the array.  If the falias argument is
    0, the list will not include any aliases; otherwise, it will.  */
 extern int uuconf_v2_system_names (void *uuconf_pglobal,
-				   char ***uuconf_ppzsystems,
-				   int uuconf_falias);
+                                   char ***uuconf_ppzsystems,
+                                   int uuconf_falias);
 
 /* Get the information for system zsystem from the V2 configuration
    files.  This will set *qsys.  */
 extern int uuconf_v2_system_info (void *uuconf_pglobal,
-				  const char *uuconf_zsystem,
-				  struct uuconf_system *uuconf_qsys);
+                                  const char *uuconf_zsystem,
+                                  struct uuconf_system *uuconf_qsys);
 
 /* Find a port from the V2 configuration files.  The arguments and
    return values are identical to those of uuconf_find_port.  */
 extern int uuconf_v2_find_port (void *uuconf_pglobal,
-				const char *uuconf_zname,
-				long uuconf_ibaud,
-				long uuconf_ihighbaud,
-				int (*uuconf_pifn) (struct uuconf_port *,
-						    void *uuconf_pinfo),
-				void *uuconf_pinfo,
-				struct uuconf_port *uuconf_qport);
+                                const char *uuconf_zname,
+                                long uuconf_ibaud,
+                                long uuconf_ihighbaud,
+                                int (*uuconf_pifn) (struct uuconf_port *,
+                                                    void *uuconf_pinfo),
+                                void *uuconf_pinfo,
+                                struct uuconf_port *uuconf_qport);
 
 #else /* ! UUCONF_ANSI_C */
 
@@ -1214,7 +1214,7 @@ extern int uuconf_v2_find_port ();
    "services" string in Sysfiles.  A NULL or "uucp" argument is taken
    as "uucico".  */
 extern int uuconf_hdb_init (void **uuconf_ppglobal,
-			    const char *uuconf_zprogram);
+                            const char *uuconf_zprogram);
 
 /* Get the names of all systems listed in the HDB configuration files.
    This sets *ppzsystems to point to an array of system names.  The
@@ -1224,14 +1224,14 @@ extern int uuconf_hdb_init (void **uuconf_ppglobal,
    alias is created by using the ALIAS= keyword in the Permissions
    file).  */
 extern int uuconf_hdb_system_names (void *uuconf_pglobal,
-				    char ***uuconf_ppzsystems,
-				    int uuconf_falias);
+                                    char ***uuconf_ppzsystems,
+                                    int uuconf_falias);
 
 /* Get the information for system zsystem from the HDB configuration
    files.  This will set *qsys.  */
 extern int uuconf_hdb_system_info (void *uuconf_pglobal,
-				   const char *uuconf_zsystem,
-				   struct uuconf_system *uuconf_qsys);
+                                   const char *uuconf_zsystem,
+                                   struct uuconf_system *uuconf_qsys);
 
 
 /* Get information for an unknown (anonymous) system.  If no
@@ -1239,46 +1239,46 @@ extern int uuconf_hdb_system_info (void *uuconf_pglobal,
    UUCONF_NOT_FOUND.  This does not run the remote.unknown shell
    script.  */
 extern int uuconf_hdb_system_unknown (void *uuconf_pglobal,
-				      struct uuconf_system *uuconf_qsys);
+                                      struct uuconf_system *uuconf_qsys);
 
 /* Find a port from the HDB configuration files.  The arguments and
    return values are identical to those of uuconf_find_port.  */
 extern int uuconf_hdb_find_port (void *uuconf_pglobal,
-				 const char *uuconf_zname,
-				 long uuconf_ibaud,
-				 long uuconf_ihighbaud,
-				 int (*uuconf_pifn) (struct uuconf_port *,
-						     void *uuconf_pinfo),
-				 void *uuconf_pinfo,
-				 struct uuconf_port *uuconf_qport);
+                                 const char *uuconf_zname,
+                                 long uuconf_ibaud,
+                                 long uuconf_ihighbaud,
+                                 int (*uuconf_pifn) (struct uuconf_port *,
+                                                     void *uuconf_pinfo),
+                                 void *uuconf_pinfo,
+                                 struct uuconf_port *uuconf_qport);
 
 /* Get the names of all dialers listed in the HDB configuration files.
    This sets *ppzdialers to point to an array of dialer names.  The
    list of names is NULL terminated.  The array is allocated using
    malloc, as is each element of the array.  */
 extern int uuconf_hdb_dialer_names (void *uuconf_pglobal,
-				    char ***uuconf_ppzdialers);
+                                    char ***uuconf_ppzdialers);
 
 /* Get the information for the dialer zdialer from the HDB
    configuration files.  This sets the fields in *qdialer.  */
 extern int uuconf_hdb_dialer_info (void *uuconf_pglobal,
-				   const char *uuconf_zdialer,
-				   struct uuconf_dialer *uuconf_qdialer);
+                                   const char *uuconf_zdialer,
+                                   struct uuconf_dialer *uuconf_qdialer);
 
 /* Get the local node name that should be used, given a login name,
    considering only the MYNAME field in the HDB Permissions file.  If
    the function returns UUCONF_SUCCESS, *pzname will point to an
    malloced buffer.  */
 extern int uuconf_hdb_login_localname (void *uuconf_pglobal,
-				       const char *uuconf_zlogin,
-				       char **pzname);
+                                       const char *uuconf_zlogin,
+                                       char **pzname);
 
 /* Get the name of the HDB remote.unknown shell script.  This does not
    actually run the shell script.  If the function returns
    UUCONF_SUCCESS, the name will be in *pzname, which will point to an
    malloced buffer.  */
 extern int uuconf_hdb_remote_unknown (void *uuconf_pglobal,
-				      char **pzname);
+                                      char **pzname);
 
 #else /* ! UUCONF_ANSI_C */
 
@@ -1303,7 +1303,7 @@ extern int uuconf_hdb_remote_unknown ();
    complete message, including the null byte.  If this is less than
    the cbytes argument, the buffer holds a truncated string.  */
 extern int uuconf_error_string (void *uuconf_pglobal, int ierror,
-				char *zbuf, UUCONF_SIZE_T cbuf);
+                                char *zbuf, UUCONF_SIZE_T cbuf);
 
 /* If UUCONF_ERROR_ERRNO is set in a return value, this function may
    be used to retrieve the errno value.  This will be the value of
@@ -1449,10 +1449,10 @@ extern int uuconf_error_lineno ();
 
 #if UUCONF_ANSI_C
 typedef int (*uuconf_cmdtabfn) (void *uuconf_pglobal,
-				int uuconf_argc,
-				char **uuconf_argv,
-				void *uuconf_pvar,
-				void *uuconf_pinfo);
+                                int uuconf_argc,
+                                char **uuconf_argv,
+                                void *uuconf_pvar,
+                                void *uuconf_pinfo);
 #else
 typedef int (*uuconf_cmdtabfn) ();
 #endif
@@ -1519,12 +1519,12 @@ struct uuconf_cmdtab
 
    This returns a normal uuconf return value, as described above.  */
 extern int uuconf_cmd_file (void *uuconf_pglobal,
-			    FILE *uuconf_e,
-			    const struct uuconf_cmdtab *uuconf_qtab,
-			    void *uuconf_pinfo,
-			    uuconf_cmdtabfn uuconf_pfiunknownfn,
-			    int uuconf_iflags,
-			    void *pblock);
+                            FILE *uuconf_e,
+                            const struct uuconf_cmdtab *uuconf_qtab,
+                            void *uuconf_pinfo,
+                            uuconf_cmdtabfn uuconf_pfiunknownfn,
+                            int uuconf_iflags,
+                            void *pblock);
 
 /* This utility function is just like uuconf_cmd_file, except that it
    only operates on a single string.  If a function is called via
@@ -1534,23 +1534,23 @@ extern int uuconf_cmd_file (void *uuconf_pglobal,
    UUCONF_CMDTABRET_KEEP and, on error, the UUCONF_CMDTABRET_EXIT
    bits, which should be honored by the calling code.  */
 extern int uuconf_cmd_line (void *uuconf_pglobal,
-			    char *uuconf_z,
-			    const struct uuconf_cmdtab *uuconf_qtab,
-			    void *uuconf_pinfo,
-			    uuconf_cmdtabfn uuconf_pfiunknownfn,
-			    int uuconf_iflags,
-			    void *pblock);
+                            char *uuconf_z,
+                            const struct uuconf_cmdtab *uuconf_qtab,
+                            void *uuconf_pinfo,
+                            uuconf_cmdtabfn uuconf_pfiunknownfn,
+                            int uuconf_iflags,
+                            void *pblock);
 
 /* This utility function is just like uuconf_cmd_line, except it is
    given a list of already parsed arguments.  */
 extern int uuconf_cmd_args (void *uuconf_pglobal,
-			    int uuconf_cargs,
-			    char **uuconf_pzargs,
-			    const struct uuconf_cmdtab *uuconf_qtab,
-			    void *uuconf_pinfo,
-			    uuconf_cmdtabfn uuconf_pfiunknownfn,
-			    int uuconf_iflags,
-			    void *pblock);
+                            int uuconf_cargs,
+                            char **uuconf_pzargs,
+                            const struct uuconf_cmdtab *uuconf_qtab,
+                            void *uuconf_pinfo,
+                            uuconf_cmdtabfn uuconf_pfiunknownfn,
+                            int uuconf_iflags,
+                            void *pblock);
 
 #else /* ! UUCONF_ANSI_C */
 
@@ -1576,7 +1576,7 @@ extern void *uuconf_malloc_block (void);
 /* Allocate memory within a memory block.  If this returns NULL, then
    malloc returned NULL, and errno is whatever malloc set it to.  */
 extern void *uuconf_malloc (void *uuconf_pblock,
-			    UUCONF_SIZE_T uuconf_cbytes);
+                            UUCONF_SIZE_T uuconf_cbytes);
 
 /* Add a block returned by the generic malloc routine to a memory
    block.  This returns zero on success, non-zero on failure.  If this

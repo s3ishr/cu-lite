@@ -81,20 +81,20 @@ fcopy_open_file (efrom, zto, fpublic, fmkdirs, fsignals)
   while ((c = fread (ab, sizeof (char), sizeof ab, efrom)) != 0)
     {
       if (fwrite (ab, sizeof (char), (size_t) c, eto) != c)
-	{
-	  ulog (LOG_ERROR, "fwrite: %s", strerror (errno));
-	  (void) fclose (eto);
-	  (void) remove (zto);
-	  return FALSE;
-	}
+        {
+          ulog (LOG_ERROR, "fwrite: %s", strerror (errno));
+          (void) fclose (eto);
+          (void) remove (zto);
+          return FALSE;
+        }
       if (fsignals && FGOT_SIGNAL ())
-	{
-	  /* Log the signal.  */
-	  ulog (LOG_ERROR, (const char *) NULL);
-	  (void) fclose (eto);
-	  (void) remove (zto);
-	  return FALSE;
-	}
+        {
+          /* Log the signal.  */
+          ulog (LOG_ERROR, (const char *) NULL);
+          (void) fclose (eto);
+          (void) remove (zto);
+          return FALSE;
+        }
     }
 
   if (! fsysdep_sync (eto, zto))
@@ -183,36 +183,36 @@ fcopy_open_file (ofrom, zto, fpublic, fmkdirs, fsignals)
   if (oto < 0)
     {
       if (errno == ENOENT && fmkdirs)
-	{
-	  if (! fsysdep_make_dirs (zto, fpublic))
-	    return FALSE;
-	  oto = creat (zto,
-		       fpublic ? IPUBLIC_FILE_MODE : IPRIVATE_FILE_MODE);
-	}
+        {
+          if (! fsysdep_make_dirs (zto, fpublic))
+            return FALSE;
+          oto = creat (zto,
+                       fpublic ? IPUBLIC_FILE_MODE : IPRIVATE_FILE_MODE);
+        }
       if (oto < 0)
-	{
-	  ulog (LOG_ERROR, "open (%s): %s", zto, strerror (errno));
-	  return FALSE;
-	}
+        {
+          ulog (LOG_ERROR, "open (%s): %s", zto, strerror (errno));
+          return FALSE;
+        }
     }
 
   while ((c = read (ofrom, ab, sizeof ab)) > 0)
     {
       if (write (oto, ab, (size_t) c) != c)
-	{
-	  ulog (LOG_ERROR, "write: %s", strerror (errno));
-	  (void) close (oto);
-	  (void) remove (zto);
-	  return FALSE;
-	}
+        {
+          ulog (LOG_ERROR, "write: %s", strerror (errno));
+          (void) close (oto);
+          (void) remove (zto);
+          return FALSE;
+        }
       if (fsignals && FGOT_SIGNAL ())
-	{
-	  /* Log the signal.  */
-	  ulog (LOG_ERROR, (const char *) NULL);
-	  (void) fclose (eto);
-	  (void) remove (zto);
-	  return FALSE;
-	}
+        {
+          /* Log the signal.  */
+          ulog (LOG_ERROR, (const char *) NULL);
+          (void) fclose (eto);
+          (void) remove (zto);
+          return FALSE;
+        }
     }
 
   if (! fsysdep_sync (oto, zto))

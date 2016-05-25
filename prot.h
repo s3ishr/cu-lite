@@ -60,7 +60,7 @@ struct sprotocol
   boolean (*pfshutdown) P((struct sdaemon *qdaemon));
   /* Send a command to the other side.  */
   boolean (*pfsendcmd) P((struct sdaemon *qdaemon, const char *z,
-			  int ilocal, int iremote));
+                          int ilocal, int iremote));
   /* Get buffer to space to fill with data.  This should set *pcdata
      to the amount of data desired.  */
   char *(*pzgetspace) P((struct sdaemon *qdaemon, size_t *pcdata));
@@ -68,7 +68,7 @@ struct sprotocol
      value of pzgetspace.  The ipos argument is the file position, and
      is ignored by most protocols.  */
   boolean (*pfsenddata) P((struct sdaemon *qdaemon, char *z, size_t c,
-			   int ilocal, int iremote, long ipos));
+                           int ilocal, int iremote, long ipos));
   /* Wait for data to come in and call fgot_data with it until
      fgot_data sets *pfexit.  */
   boolean (*pfwait) P((struct sdaemon *qdaemon));
@@ -79,8 +79,8 @@ struct sprotocol
      file.  If *pfhandled is set to TRUE, then the protocol routine
      has taken care of queueing up qtrans for the next action.  */
   boolean (*pffile) P((struct sdaemon *qdaemon, struct stransfer *qtrans,
-		       boolean fstart, boolean fsend, long cbytes,
-		       boolean *pfhandled));
+                       boolean fstart, boolean fsend, long cbytes,
+                       boolean *pfhandled));
 };
 
 /* Send data to the other system.  If the fread argument is TRUE, this
@@ -89,8 +89,8 @@ struct sprotocol
    make sure the input buffer does not fill up.  Returns FALSE on
    error.  */
 extern boolean fsend_data P((struct sconnection *qconn,
-			     const char *zsend, size_t csend,
-			     boolean fdoread));
+                             const char *zsend, size_t csend,
+                             boolean fdoread));
 
 /* Receive data from the other system when there is no data to send.
    The cneed argument is the amount of data desired and the ctimeout
@@ -98,8 +98,8 @@ extern boolean fsend_data P((struct sconnection *qconn,
    amount of data received.  It will return FALSE on error.  If a
    timeout occurs, it will return TRUE with *pcrec set to zero.  */
 extern boolean freceive_data P((struct sconnection *qconn, size_t cneed,
-				size_t *pcrec, int ctimeout,
-				boolean freport));
+                                size_t *pcrec, int ctimeout,
+                                boolean freport));
 
 /* Get one character from the remote system, going through the
    procotol buffering.  The ctimeout argument is the timeout in
@@ -108,7 +108,7 @@ extern boolean freceive_data P((struct sconnection *qconn, size_t cneed,
    errors).  This returns a character or -1 on a timeout or -2 on an
    error.  */
 extern int breceive_char P((struct sconnection *qconn,
-			    int ctimeout, boolean freport));
+                            int ctimeout, boolean freport));
 
 /* Compute a 32 bit CRC of a data buffer, given an initial CRC.  */
 extern unsigned long icrc P((const char *z, size_t c, unsigned long ick));
@@ -148,16 +148,16 @@ extern int cIsync_timeout;
 
 /* Shared startup routine for the 'i' and 'j' protocols.  */
 extern boolean fijstart P((struct sdaemon *qdaemon, char **pzlog,
-			   int imaxpacksize,
-			   boolean (*pfsend) P((struct sconnection *qconn,
-						const char *zsend,
-						size_t csend,
-						boolean fdoread)),
-			   boolean (*pfreceive) P((struct sconnection *qconn,
-						   size_t cneed,
-						   size_t *pcrec,
-						   int ctimeout,
-						   boolean freport))));
+                           int imaxpacksize,
+                           boolean (*pfsend) P((struct sconnection *qconn,
+                                                const char *zsend,
+                                                size_t csend,
+                                                boolean fdoread)),
+                           boolean (*pfreceive) P((struct sconnection *qconn,
+                                                   size_t cneed,
+                                                   size_t *pcrec,
+                                                   int ctimeout,
+                                                   boolean freport))));
 
 /* Prototypes for 'g' protocol functions.  */
 
@@ -167,10 +167,10 @@ extern boolean fbiggstart P((struct sdaemon *qdaemon, char **pzlog));
 extern boolean fvstart P((struct sdaemon *qdaemon, char **pzlog));
 extern boolean fgshutdown P((struct sdaemon *qdaemon));
 extern boolean fgsendcmd P((struct sdaemon *qdaemon, const char *z,
-			    int ilocal, int iremote));
+                            int ilocal, int iremote));
 extern char *zggetspace P((struct sdaemon *qdaemon, size_t *pcdata));
 extern boolean fgsenddata P((struct sdaemon *qdaemon, char *z, size_t c,
-			     int ilocal, int iremote, long ipos));
+                             int ilocal, int iremote, long ipos));
 extern boolean fgwait P((struct sdaemon *qdaemon));
 
 /* Prototypes for 'f' protocol functions.  */
@@ -179,14 +179,14 @@ extern struct uuconf_cmdtab asFproto_params[];
 extern boolean ffstart P((struct sdaemon *qdaemon, char **pzlog));
 extern boolean ffshutdown P((struct sdaemon *qdaemon));
 extern boolean ffsendcmd P((struct sdaemon *qdaemon, const char *z,
-			    int ilocal, int iremote));
+                            int ilocal, int iremote));
 extern char *zfgetspace P((struct sdaemon *qdaemon, size_t *pcdata));
 extern boolean ffsenddata P((struct sdaemon *qdaemon, char *z, size_t c,
-			     int ilocal, int iremote, long ipos));
+                             int ilocal, int iremote, long ipos));
 extern boolean ffwait P((struct sdaemon *qdaemon));
 extern boolean fffile P((struct sdaemon *qdaemon, struct stransfer *qtrans,
-			 boolean fstart, boolean fsend, long cbytes,
-			 boolean *pfhandled));
+                         boolean fstart, boolean fsend, long cbytes,
+                         boolean *pfhandled));
 
 /* Prototypes for 't' protocol functions.  */
 
@@ -194,14 +194,14 @@ extern struct uuconf_cmdtab asTproto_params[];
 extern boolean ftstart P((struct sdaemon *qdaemon, char **pzlog));
 extern boolean ftshutdown P((struct sdaemon *qdaemon));
 extern boolean ftsendcmd P((struct sdaemon *qdaemon, const char *z,
-			    int ilocal, int iremote));
+                            int ilocal, int iremote));
 extern char *ztgetspace P((struct sdaemon *qdaemon, size_t *pcdata));
 extern boolean ftsenddata P((struct sdaemon *qdaemon, char *z, size_t c,
-			     int ilocal, int iremote, long ipos));
+                             int ilocal, int iremote, long ipos));
 extern boolean ftwait P((struct sdaemon *qdaemon));
 extern boolean ftfile P((struct sdaemon *qdaemon, struct stransfer *qtrans,
-			 boolean fstart, boolean fsend, long cbytes,
-			 boolean *pfhandled));
+                         boolean fstart, boolean fsend, long cbytes,
+                         boolean *pfhandled));
 
 /* Prototypes for 'e' protocol functions.  */
 
@@ -209,14 +209,14 @@ extern struct uuconf_cmdtab asEproto_params[];
 extern boolean festart P((struct sdaemon *qdaemon, char **pzlog));
 extern boolean feshutdown P((struct sdaemon *qdaemon));
 extern boolean fesendcmd P((struct sdaemon *qdaemon, const char *z,
-			    int ilocal, int iremote));
+                            int ilocal, int iremote));
 extern char *zegetspace P((struct sdaemon *qdaemon, size_t *pcdata));
 extern boolean fesenddata P((struct sdaemon *qdaemon, char *z, size_t c,
-			     int ilocal, int iremote, long ipos));
+                             int ilocal, int iremote, long ipos));
 extern boolean fewait P((struct sdaemon *qdaemon));
 extern boolean fefile P((struct sdaemon *qdaemon, struct stransfer *qtrans,
-			 boolean fstart, boolean fsend, long cbytes,
-			 boolean *pfhandled));
+                         boolean fstart, boolean fsend, long cbytes,
+                         boolean *pfhandled));
 
 /* Prototypes for 'i' protocol functions.  */
 
@@ -224,10 +224,10 @@ extern struct uuconf_cmdtab asIproto_params[];
 extern boolean fistart P((struct sdaemon *qdaemon, char **pzlog));
 extern boolean fishutdown P((struct sdaemon *qdaemon));
 extern boolean fisendcmd P((struct sdaemon *qdaemon, const char *z,
-			    int ilocal, int iremote));
+                            int ilocal, int iremote));
 extern char *zigetspace P((struct sdaemon *qdaemon, size_t *pcdata));
 extern boolean fisenddata P((struct sdaemon *qdaemon, char *z, size_t c,
-			     int ilocal, int iremote, long ipos));
+                             int ilocal, int iremote, long ipos));
 extern boolean fiwait P((struct sdaemon *qdaemon));
 
 /* Prototypes for 'j' protocol functions.  The 'j' protocol mostly
@@ -244,14 +244,14 @@ extern struct uuconf_cmdtab asZproto_params[];
 extern boolean fzstart P((struct sdaemon *qdaemon, char **pzlog));
 extern boolean fzshutdown P((struct sdaemon *qdaemon));
 extern boolean fzsendcmd P((struct sdaemon *qdaemon, const char *z,
-			    int ilocal, int iremote));
+                            int ilocal, int iremote));
 extern char *zzgetspace P((struct sdaemon *qdaemon, size_t *pcdata));
 extern boolean fzsenddata P((struct sdaemon *qdaemon, char *z, size_t c,
-			     int ilocal, int iremote, long ipos));
+                             int ilocal, int iremote, long ipos));
 extern boolean fzwait P((struct sdaemon *qdaemon));
 extern boolean fzfile P((struct sdaemon *qdaemon, struct stransfer *qtrans,
-			 boolean fstart, boolean fsend, long cbytes,
-			 boolean *pfhandled));
+                         boolean fstart, boolean fsend, long cbytes,
+                         boolean *pfhandled));
 
 /* Prototypes for 'y' protocol functions.  */
 
@@ -259,11 +259,11 @@ extern struct uuconf_cmdtab asYproto_params[];
 extern boolean fystart P((struct sdaemon *qdaemon, char **pzlog));
 extern boolean fyshutdown P((struct sdaemon *qdaemon));
 extern boolean fysendcmd P((struct sdaemon *qdaemon, const char *z,
-			    int ilocal, int iremote));
+                            int ilocal, int iremote));
 extern char *zygetspace P((struct sdaemon *qdaemon, size_t *pcdata));
 extern boolean fysenddata P((struct sdaemon *qdaemon, char *z, size_t c,
-			     int ilocal, int iremote, long ipos));
+                             int ilocal, int iremote, long ipos));
 extern boolean fywait P((struct sdaemon *qdaemon));
 extern boolean fyfile P((struct sdaemon *qdaemon, struct stransfer *qtrans,
-			 boolean fstart, boolean fsend, long cbytes,
-			 boolean *pfhandled));
+                         boolean fstart, boolean fsend, long cbytes,
+                         boolean *pfhandled));

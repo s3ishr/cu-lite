@@ -390,20 +390,20 @@ struct ssysdep_conn
 /* These functions do I/O and chat scripts to a port.  They are called
    by the TCP and TLI routines.  */
 extern boolean fsysdep_conn_read P((struct sconnection *qconn,
-				    char *zbuf, size_t *pclen,
-				    size_t cmin, int ctimeout,
-				    boolean freport));
+                                    char *zbuf, size_t *pclen,
+                                    size_t cmin, int ctimeout,
+                                    boolean freport));
 extern boolean fsysdep_conn_write P((struct sconnection *qconn,
-				     const char *zbuf, size_t clen));
+                                     const char *zbuf, size_t clen));
 extern boolean fsysdep_conn_io P((struct sconnection *qconn,
-				  const char *zwrite, size_t *pcwrite,
-				  char *zread, size_t *pcread));
+                                  const char *zwrite, size_t *pcwrite,
+                                  char *zread, size_t *pcread));
 extern boolean fsysdep_conn_chat P((struct sconnection *qconn,
-				    char **pzprog));
+                                    char **pzprog));
 
 /* Set a signal handler.  */
 extern void usset_signal P((int isig, RETSIGTYPE (*pfn) P((int)),
-			    boolean fforce, boolean *pfignored));
+                            boolean fforce, boolean *pfignored));
 
 /* Default signal handler.  This sets the appropriate element of the
    afSignal array.  If system calls are automatically restarted, it
@@ -424,15 +424,15 @@ extern pid_t ixsfork P((void));
 #define SPAWN_WRITE_PIPE (-3)
 
 extern pid_t ixsspawn P((const char **pazargs, int *aidescs,
-			 boolean fkeepuid, boolean fkeepenv,
-			 const char *zchdir, boolean fnosigs,
-			 boolean fshell, const char *zpath,
-			 const char *zuu_machine,
-			 const char *zuu_user));
+                         boolean fkeepuid, boolean fkeepenv,
+                         const char *zchdir, boolean fnosigs,
+                         boolean fshell, const char *zpath,
+                         const char *zuu_machine,
+                         const char *zuu_user));
 
 /* Do a form of popen using ixsspawn.  */
 extern FILE *espopen P((const char **pazargs, boolean frd,
-			pid_t *pipid));
+                        pid_t *pipid));
 
 /* Wait for a particular process to finish, returning the exit status.
    The process ID should be pid_t, but we can't put that in a
@@ -441,29 +441,29 @@ extern int ixswait P((unsigned long ipid, const char *zreport));
 
 /* Read from a connection using two file descriptors.  */
 extern boolean fsdouble_read P((struct sconnection *qconn, char *zbuf,
-				size_t *pclen, size_t cmin, int ctimeout,
-				boolean freport));
+                                size_t *pclen, size_t cmin, int ctimeout,
+                                boolean freport));
 
 /* Write to a connection using two file descriptors.  */
 extern boolean fsdouble_write P((struct sconnection *qconn,
-				 const char *zbuf, size_t clen));
+                                 const char *zbuf, size_t clen));
 
 /* Run a chat program on a connection using two file descriptors.  */
 extern boolean fsdouble_chat P((struct sconnection *qconn,
-				char **pzprog));
+                                char **pzprog));
 
 /* Find a spool file in the spool directory.  For a local file, the
    bgrade argument is the grade of the file.  This is needed for
    SPOOLDIR_SVR4.  */
 extern char *zsfind_file P((const char *zsimple, const char *zsystem,
-			    int bgrade));
+                            int bgrade));
 
 /* Return the grade given a sequence number.  */
 extern int bsgrade P((pointer pseq));
 
 /* Lock a string.  */
 extern boolean fsdo_lock P((const char *, boolean fspooldir,
-			    boolean *pferr));
+                            boolean *pferr));
 
 /* Unlock a string.  */
 extern boolean fsdo_unlock P((const char *, boolean fspooldir));
@@ -471,7 +471,7 @@ extern boolean fsdo_unlock P((const char *, boolean fspooldir));
 /* Check access for a particular user name, or NULL to check access
    for any user.  */
 extern boolean fsuser_access P((const struct stat *, int imode,
-				const char *zuser));
+                                const char *zuser));
 
 /* Switch to the permissions of the invoking user.  This sets the
    arguments to values to pass to fsuucp_perms.  */
@@ -483,11 +483,11 @@ extern boolean fsuucp_perms P((long, long));
 
 /* Stick two directories and a file name together.  */
 extern char *zsappend3 P((const char *zdir1, const char *zdir2,
-			  const char *zfile));
+                          const char *zfile));
 
 /* Stick three directories and a file name together.  */
 extern char *zsappend4 P((const char *zdir1, const char *zdir2,
-			  const char *zdir3, const char *zfile));
+                          const char *zdir3, const char *zfile));
 
 /* Get a temporary file name.  */
 extern char *zstemp_file P((const struct uuconf_system *qsys));
@@ -497,13 +497,13 @@ extern char *zscmd_file P((const struct uuconf_system *qsys, int bgrade));
 
 /* Get a jobid from a system, a file name, and a grade.  */
 extern char *zsfile_to_jobid P((const struct uuconf_system *qsys,
-				const char *zfile,
-				int bgrade));
+                                const char *zfile,
+                                int bgrade));
 
 /* Get a file name from a jobid.  This also returns the associated system
    in *pzsystem and the grade in *pbgrade.  */
 extern char *zsjobid_to_file P((const char *zid, char **pzsystem,
-				char *pbgrade));
+                                char *pbgrade));
 
 /* See whether there is a spool directory for a system when using
    SPOOLDIR_ULTRIX.  */
@@ -513,7 +513,7 @@ extern boolean fsultrix_has_spool P((const char *zsystem));
 /* Lock a coherent tty.  */
 extern boolean lockttyexist P((const char *z));
 extern boolean fscoherent_disable_tty P((const char *zdevice,
-					 char **pzenable));
+                                         char **pzenable));
 #endif
 
 /* Some replacements for standard Unix functions.  */
@@ -524,10 +524,10 @@ extern int dup2 P((int oold, int onew));
 
 #if ! HAVE_FTW
 extern int ftw P((const char *zdir,
-		  int (*pfn) P((const char *zfile,
-				const struct stat *qstat,
-				int iflag)),
-		  int cdescriptors));
+                  int (*pfn) P((const char *zfile,
+                                const struct stat *qstat,
+                                int iflag)),
+                  int cdescriptors));
 #endif
 
 #if ! HAVE_GETCWD && ! HAVE_GETWD
