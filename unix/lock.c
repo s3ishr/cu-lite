@@ -49,13 +49,6 @@ const char lock_rcsid[] = "$Id: lock.c,v 1.23 2002/03/05 19:10:42 ian Rel $";
 #include <time.h>
 #endif
 
-#if HAVE_QNX_LOCKFILES
-#include <sys/kernel.h>
-#include <sys/psinfo.h>
-#include <sys/seginfo.h>
-#include <sys/vc.h>
-#endif
-
 #ifndef O_RDONLY
 #define O_RDONLY 0
 #define O_WRONLY 1
@@ -74,11 +67,6 @@ const char lock_rcsid[] = "$Id: lock.c,v 1.23 2002/03/05 19:10:42 ian Rel $";
 extern struct tm *localtime ();
 #endif
 
-#if HAVE_QNX_LOCKFILES
-static boolean fsqnx_stale P((unsigned long ipid, unsigned long inme,
-			     unsigned long inid, boolean *pferr));
-#endif
-
 /* Lock something.  If the fspooldir argument is TRUE, the argument is
    a file name relative to the spool directory; otherwise the argument
    is a simple file name which should be created in the system lock
@@ -97,17 +85,7 @@ fsdo_lock (zlock, fspooldir, pferr)
   char *ztempfile;
   char abtempfile[sizeof "TMP12345678901234567890"];
   int o;
-#if HAVE_QNX_LOCKFILES
-  nid_t inme;
-  char ab[23];
-  char *zend;
-#else
-#if HAVE_V2_LOCKFILES
-  int i;
-#else
   char ab[12];
-#endif
-#endif
   int cwrote;
   const char *zerr;
   boolean fret;
@@ -127,9 +105,6 @@ fsdo_lock (zlock, fspooldir, pferr)
     }
 
   ime = getpid ();
-#if HAVE_QNX_LOCKFILES
-  inme = getnid ();
-#endif
 
   /* We do the actual lock by creating a file and then linking it to
      the final file name we want.  This avoids race conditions due to
@@ -145,12 +120,7 @@ fsdo_lock (zlock, fspooldir, pferr)
   else
     cslash = zslash - zpath + 1;
 
-#if HAVE_QNX_LOCKFILES
-  sprintf (abtempfile, "TMP%010lx%010lx", (unsigned long) ime,
-	   (unsigned long) inme);
-#else
   sprintf (abtempfile, "TMP%010lx", (unsigned long) ime);
-#endif
   ztempfile = zbufalc (cslash + sizeof abtempfile);
   memcpy (ztempfile, zpath, cslash);
   memcpy (ztempfile + cslash, abtempfile, sizeof abtempfile);
@@ -177,18 +147,8 @@ fsdo_lock (zlock, fspooldir, pferr)
 	}
     }
 
-#if HAVE_QNX_LOCKFILES
-  sprintf (ab, "%10ld %10ld\n", (long) ime, (long) inme);
-  cwrote = write (o, ab, strlen (ab));
-#else
-#if HAVE_V2_LOCKFILES
-  i = (int) ime;
-  cwrote = write (o, &i, sizeof i);
-#else
   sprintf (ab, "%10ld\n", (long) ime);
   cwrote = write (o, ab, strlen (ab));
-#endif
-#endif
 
   zerr = NULL;
   if (cwrote < 0)
@@ -222,9 +182,6 @@ fsdo_lock (zlock, fspooldir, pferr)
       boolean freadonly;
       struct stat st;
       char abtime[sizeof "1991-12-31 12:00:00"];
-#if HAVE_QNX_LOCKFILES
-      nid_t inid;
-#endif
 
       fret = FALSE;
 
@@ -262,11 +219,7 @@ fsdo_lock (zlock, fspooldir, pferr)
 
       /* The race starts here.  See below for a discussion.  */
 
-#if HAVE_V2_LOCKFILES
-      cgot = read (o, &i, sizeof i);
-#else
       cgot = read (o, ab, sizeof ab - 1);
-#endif
 
       if (cgot < 0)
 	{
@@ -275,36 +228,14 @@ fsdo_lock (zlock, fspooldir, pferr)
 	}
 
 #if DEBUG > 0
-#if HAVE_V2_LOCKFILES
-      {
-	char ab[10];
-
-	if (read (o, ab, sizeof ab) > 4
-	    && isdigit (BUCHAR (ab[0])))
-	  ulog (LOG_ERROR,
-		"Lock file %s may be HDB format; check LOCKFILES in policy.h",
-		zpath);
-      }
-#else
       if (cgot == 4)
 	ulog (LOG_ERROR,
 	      "Lock file %s may be V2 format; check LOCKFILES in policy.h",
 	      zpath);
-#endif
 #endif /* DEBUG > 0 */
 
-#if HAVE_QNX_LOCKFILES
-      ab[cgot] = '\0';
-      ipid = (pid_t) strtol (ab, &zend, 10);
-      inid = (nid_t) strtol (zend, (char **) NULL, 10);
-#else
-#if HAVE_V2_LOCKFILES
-      ipid = (pid_t) i;
-#else
       ab[cgot] = '\0';
       ipid = (pid_t) strtol (ab, (char **) NULL, 10);
-#endif
-#endif
 
       /* On NFS, the link might have actually succeeded even though we
 	 got a failure return.  This can happen if the original
@@ -318,9 +249,6 @@ fsdo_lock (zlock, fspooldir, pferr)
 	 going to worry about this possibility.  */
       if (ipid == ime)
 	{
-#if HAVE_QNX_LOCKFILES
-	  if (inid == inme)
-#endif
 	    {
 	      fret = TRUE;
 	      break;
@@ -332,17 +260,11 @@ fsdo_lock (zlock, fspooldir, pferr)
          file was created but before the process ID was written out.  */
       if (cgot > 0)
 	{
-#if HAVE_QNX_LOCKFILES
-	  if (! fsqnx_stale ((unsigned long) ipid, (unsigned long) inme,
-			     (unsigned long) inid, pferr))
-	    break;
-#else
 	  /* If the process still exists, we will get EPERM rather
 	     than ESRCH.  We then return FALSE to indicate that we
 	     cannot make the lock.  */
 	  if (kill (ipid, 0) == 0 || errno == EPERM)
 	    break;
-#endif
 	}
 
       if (fstat (o, &st) < 0)
@@ -359,14 +281,8 @@ fsdo_lock (zlock, fspooldir, pferr)
 		   q->tm_min, q->tm_sec);
 	}
 
-#if HAVE_QNX_LOCKFILES
-      ulog (LOG_ERROR,
-	    "Stale lock %s held by process %ld on node %ld created %s",
-	    zpath, (long) ipid, (long) inid, abtime);
-#else
       ulog (LOG_ERROR, "Stale lock %s held by process %ld created %s",
 	    zpath, (long) ipid, abtime);
-#endif
 
       /* This is a stale lock, created by a process that no longer
 	 exists.
@@ -439,18 +355,8 @@ fsdo_lock (zlock, fspooldir, pferr)
 	  break;
 	}
 
-#if HAVE_QNX_LOCKFILES
-      sprintf (ab, "%10ld %10ld\n", (long) ime, (long) inme);
-      cwrote = write (o, ab, strlen (ab));
-#else
-#if HAVE_V2_LOCKFILES
-      i = (int) ime;
-      cwrote = write (o, &i, sizeof i);
-#else
       sprintf (ab, "%10ld\n", (long) ime);
       cwrote = write (o, ab, strlen (ab));
-#endif
-#endif
 
       if (cwrote < 0)
 	{
@@ -466,11 +372,7 @@ fsdo_lock (zlock, fspooldir, pferr)
 	  break;
 	}
 
-#if HAVE_V2_LOCKFILES
-      cgot = read (o, &i, sizeof i);
-#else
       cgot = read (o, ab, sizeof ab - 1);
-#endif
 
       if (cgot < 0)
 	{
@@ -478,24 +380,11 @@ fsdo_lock (zlock, fspooldir, pferr)
 	  break;
 	}
 
-#if HAVE_QNX_LOCKFILES
-      ab[cgot] = '\0';
-      ipid = (pid_t) strtol (ab, &zend, 10);
-      inid = (nid_t) strtol (zend, (char **) NULL, 10);
-#else
-#if HAVE_V2_LOCKFILES
-      ipid = (pid_t) i;
-#else
       ab[cgot] = '\0';
       ipid = (pid_t) strtol (ab, (char **) NULL, 10);
-#endif
-#endif
 
       if (ipid == ime)
 	{
-#if HAVE_QNX_LOCKFILES
-	  if (inid == inme)
-#endif
 	    {
 	      struct stat sfile, sdescriptor;
 
@@ -604,90 +493,4 @@ fsdo_unlock (zlock, fspooldir)
       return FALSE;
     }
 }
-
-#if HAVE_QNX_LOCKFILES
 
-/* Return TRUE if the lock is stale.  */
-
-static boolean
-fsqnx_stale (ipid, inme, inid, pferr)
-     unsigned long ipid;
-     unsigned long inme;
-     unsigned long inid;
-     boolean *pferr;
-{
-  /* A virtual process ID.  This virtual process ID, which will exist
-     on the local node, will represent the process ID of the process
-     manager process (Proc) on the remote node. */
-  pid_t ivid;
-  /* The return value of the qnx_psinfo function.  This is either a
-     process ID which might or might not be the same as the process
-     being looked for, or -1 to indicate no process found. */
-  pid_t ifound_pid;
-  /* This holds the actual result of qnx_psinfo.  We will ignore
-     almost all the fields since we're just checking for existence. */
-  struct _psinfo spsdata;
-
-  /* Establish connection with a remote process manager if necessary. */
-  if (inid != inme)
-    {
-      ivid = qnx_vc_attach (inid /* remote node ID */,
-			    PROC_PID /* pid of process manager */,
-			    1000 /* initial buffer size */,
-			    0	/* flags */);
-      if (ivid < 0)
-	{
-	  ulog (LOG_ERROR, "qnx_vc_attach (%lu, PROC_PID): %s",
-		inid, strerror (errno));
-	  if (pferr != NULL)
-	    *pferr = TRUE;
-	  return FALSE;
-	}
-    }
-  else
-    {
-      /* Use the local pid of the local process manager. */
-      ivid = PROC_PID;
-    }
-        
-  /* Request the process information. */
-  ifound_pid = qnx_psinfo (ivid /* process manager handling request */,
-			   ipid /* get info on this process */,
-			   &spsdata /* put info in this struct */,
-			   0	/* unused */,
-			   (struct _seginfo *) NULL /* unused */);
-
-  /* Deallocate the virtual connection before continuing. */
-  {
-    int isaved_errno = errno;
-    if (qnx_vc_detach (ivid) < 0)
-      ulog (LOG_ERROR, "qnx_vd_detach (%ld): %s", (long) ivid,
-	    strerror (errno));
-    errno = isaved_errno;
-  }
-          
-  /* If the returned pid matches then the process still holds the lock. */
-  if ((ifound_pid == ipid) && (spsdata.pid == ipid))
-    return FALSE;
-
-  /* If the returned pid is positive and doesn't match, then the
-     process doesn't exist and the lock is stale.  Continue. */
-
-  /* If the returned pid is negative (-1) and errno is EINVAL (or ESRCH
-     in older versions of QNX), then the process doesn't exist and the
-     lock is stale.  Continue. */
-
-  /* Check for impossible errors. */
-  if ((ifound_pid < 0) && (errno != ESRCH) && (errno != EINVAL))
-    {
-      ulog (LOG_ERROR, "qnx_psinfo (%ld, %ld): %s", (long) ivid,
-	    (long) ipid, strerror (errno));
-      /* Since we don't know what the hell this means, and we don't
-	 want our system to freeze, we treat this case as a stale
-	 lock.  Continue on. */
-    }
-
-  return TRUE;
-}
-
-#endif /* HAVE_QNX_LOCKFILES */

@@ -33,13 +33,6 @@ struct uuconf_system;
 struct sconnection;
 #endif
 
-/* SCO, SVR4 and Sequent lockfiles are basically just like HDB
-   lockfiles.  */
-#if HAVE_SCO_LOCKFILES || HAVE_SVR4_LOCKFILES || HAVE_SEQUENT_LOCKFILES
-#undef HAVE_HDB_LOCKFILES
-#define HAVE_HDB_LOCKFILES 1
-#endif
-
 #if HAVE_BSD_TTY + HAVE_SYSV_TERMIO + HAVE_POSIX_TERMIOS != 1
  #error Terminal driver define not set or duplicated
 #endif
@@ -376,11 +369,6 @@ struct ssysdep_conn
   /* Process ID of currently executing pipe command, or parent process
      of forked TCP or TLI server, or -1.  */
   pid_t ipid;
-#if HAVE_COHERENT_LOCKFILES
-  /* On Coherent we need to hold on to the real port name which will
-     be used to enable the port.  Ick.  */
-  char *zenable;
-#endif
 };
 
 /* These functions do I/O and chat scripts to a port.  They are called

@@ -100,24 +100,6 @@ const char serial_rcsid[] = "$Id: serial.c,v 1.78 2002/03/05 19:10:42 ian Rel $"
 #include <termio.h>
 #endif
 
-#if HAVE_SVR4_LOCKFILES
-/* Get the right definitions for major and minor.  */
-#if MAJOR_IN_MKDEV
-#include <sys/mkdev.h>
-#endif /* MAJOR_IN_MKDEV */
-#if MAJOR_IN_SYSMACROS
-#include <sys/sysmacros.h>
-#endif /* MAJOR_IN_SYSMACROS */
-#if ! MAJOR_IN_MKDEV && ! MAJOR_IN_SYSMACROS
-#ifndef major
-#define major(i) (((i) >> 8) & 0xff)
-#endif
-#ifndef minor
-#define minor(i) ((i) & 0xff)
-#endif
-#endif /* ! MAJOR_IN_MKDEV && ! MAJOR_IN_SYSMACROS */
-#endif /* HAVE_SVR4_LOCKFILES */
-
 #if HAVE_DEV_INFO
 #include <sys/dev.h>
 #endif
@@ -560,12 +542,8 @@ usserial_free (qconn)
   xfree ((pointer) qsysdep);
   qconn->psysdep = NULL;
 }
-
-#if HAVE_SEQUENT_LOCKFILES
-#define LCK_TEMPLATE "LCK..tty"
-#else
+
 #define LCK_TEMPLATE "LCK.."
-#endif
 
 /* This routine is used for both locking and unlocking.  It is the
    only routine which knows how to translate a device name into the
@@ -590,40 +568,6 @@ fsserial_lockfile (flok, qconn)
   zalc = NULL;
   if (z == NULL)
     {
-#if HAVE_QNX_LOCKFILES
-      {
-	nid_t idevice_nid;
-	char abdevice_nid[13]; /* length of long, a period, and a NUL */
-	size_t cdevice_nid;
-	const char *zbase;
-	size_t clen;
-
-        /* If the node ID is explicitly specified as part of the
-           pathname to the device, use that.  Otherwise, presume the
-           device is local to the current node. */
-        if (qsysdep->zdevice[0] == '/' && qsysdep->zdevice[1] == '/')
-          idevice_nid = (nid_t) strtol (qsysdep->zdevice + 2,
-					(char **) NULL, 10);
-        else
-          idevice_nid = getnid ();
-
-        sprintf (abdevice_nid, "%ld.", (long) idevice_nid);
-        cdevice_nid = strlen (abdevice_nid);
-
- 	zbase = strrchr (qsysdep->zdevice, '/') + 1;
- 	clen = strlen (zbase);
-
-        zalc = zbufalc (sizeof LCK_TEMPLATE + cdevice_nid + clen);
-
-	memcpy (zalc, LCK_TEMPLATE, sizeof LCK_TEMPLATE - 1);
-	memcpy (zalc + sizeof LCK_TEMPLATE - 1, abdevice_nid, cdevice_nid);
-	memcpy (zalc + sizeof LCK_TEMPLATE - 1 + cdevice_nid,
-		zbase, clen + 1);
-
-	z = zalc;
-      }
-#else /* ! HAVE_QNX_LOCKFILES */
-#if ! HAVE_SVR4_LOCKFILES
       {
 	const char *zbase;
 	size_t clen;
@@ -633,96 +577,14 @@ fsserial_lockfile (flok, qconn)
 	zalc = zbufalc (sizeof LCK_TEMPLATE + clen);
 	memcpy (zalc, LCK_TEMPLATE, sizeof LCK_TEMPLATE - 1);
 	memcpy (zalc + sizeof LCK_TEMPLATE - 1, zbase, clen + 1);
-#if HAVE_SCO_LOCKFILES
-	{
-	  char *zl;
-
-	  zl = zalc + sizeof LCK_TEMPLATE + clen - 2;
-	  if (isupper (*zl))
-	    *zl = tolower (*zl);
-	}
-#endif
 	z = zalc;
       }
-#else /* HAVE_SVR4_LOCKFILES */
-      {
-	struct stat s;
-
-	if (stat (qsysdep->zdevice, &s) != 0)
-	  {
-	    ulog (LOG_ERROR, "stat (%s): %s", qsysdep->zdevice,
-		  strerror (errno));
-	    return FALSE;
-	  }
-	zalc = zbufalc (sizeof "LK.1234567890.1234567890.1234567890");
-	sprintf (zalc, "LK.%03d.%03d.%03d", major (s.st_dev),
-		 major (s.st_rdev), minor (s.st_rdev));
-	z = zalc;
-      }
-#endif /* HAVE_SVR4_LOCKFILES */
-#endif /* ! HAVE_QNX_LOCKFILES */
     }
 
   if (flok)
     fret = fsdo_lock (z, FALSE, (boolean *) NULL);
   else
     fret = fsdo_unlock (z, FALSE);
-
-#if HAVE_COHERENT_LOCKFILES
-  if (fret)
-    {
-      if (flok)
-	{
-	  if (lockttyexist (z + sizeof LCK_TEMPLATE - 1))
-	    {
-	      ulog (LOG_NORMAL, "%s: port already locked",
-		    z + sizeof LCK_TEMPLATE - 1);
-	      fret = FALSE;
-	    }
-	  else
-	    fret = fscoherent_disable_tty (z + sizeof LCK_TEMPLATE - 1,
-					   &qsysdep->zenable);
-	}
-      else
-	{
-	  fret = TRUE;
-	  if (qsysdep->zenable != NULL)
-	    {
-	      const char *azargs[3];
-	      int aidescs[3];
-	      pid_t ipid;
-
-	      azargs[0] = "/etc/enable";
-	      azargs[1] = qsysdep->zenable;
-	      azargs[2] = NULL;
-	      aidescs[0] = SPAWN_NULL;
-	      aidescs[1] = SPAWN_NULL;
-	      aidescs[2] = SPAWN_NULL;
-
-	      ipid = ixsspawn (azargs, aidescs, TRUE, FALSE,
-			       (const char *) NULL, TRUE, TRUE,
-			       (const char *) NULL, (const char *) NULL,
-			       (const char *) NULL);
-	      if (ipid < 0)
-		{
-		  ulog (LOG_ERROR, "ixsspawn (/etc/enable %s): %s",
-			qsysdep->zenable, strerror (errno));
-		  fret = FALSE;
-		}
-	      else
-		{
-		  if (ixswait ((unsigned long) ipid, (const char *) NULL)
-		      == 0)
-		    fret = TRUE;
-		  else
-		    fret = FALSE;
-		}
-	      ubuffree (qsysdep->zenable);
-	      qsysdep->zenable = NULL;
-	    }
-	}
-    }
-#endif /* HAVE_COHERENT_LOCKFILES */
 
   ubuffree (zalc);
   return fret;
