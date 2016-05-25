@@ -366,47 +366,6 @@
    not used.  */
 #define BDEFAULT_UUX_GRADE ('N')
 
-/* You must select which type of logging you want by setting exactly
-   one of the following to 1.  These control output to the log file
-   and to the statistics file.
-
-   If you define HAVE_TAYLOR_LOGGING, each line in the log file will
-   look something like this:
-
-   uucico uunet uucp (1991-12-10 09:04:34.45 16390) Receiving uunet/D./D.uunetSwJ72
-
-   and each line in the statistics file will look something like this:
-
-   uucp uunet (1991-12-10 09:04:40.20) received 2371 bytes in 5 seconds (474 bytes/sec)
-
-   If you define HAVE_V2_LOGGING, each line in the log file will look
-   something like this:
-
-   uucico uunet uucp (12/10-09:04 16390) Receiving uunet/D./D.uunetSwJ72
-
-   and each line in the statistics file will look something like this:
-
-   uucp uunet (12/10-09:04 16390) (692373862) received data 2371 bytes 5 seconds
-
-   If you define HAVE_HDB_LOGGING, each program will by default use a
-   separate log file.  For uucico talking to uunet, for example, it
-   will be /usr/spool/uucp/.Log/uucico/uunet.  Each line will look
-   something like this:
-
-   uucp uunet (12/10-09:04:22,16390,1) Receiving uunet/D./D.uunetSwJ72
-
-   and each line in the statistics file will look something like this:
-
-   uunet!uucp M (12/10-09:04:22) (C,16390,1) [ttyXX] <- 2371 / 5.000 secs, 474 bytes/sec
-
-   The main reason to prefer one format over another is that you may
-   have shell scripts which expect the files to have a particular
-   format.  If you have none, choose whichever format you find more
-   appealing.  */
-#define HAVE_TAYLOR_LOGGING 1
-#define HAVE_V2_LOGGING 0
-#define HAVE_HDB_LOGGING 0
-
 /* If QNX_LOG_NODE_ID is set to 1, log messages will include the QNX
    node ID just after the process ID.  This is a policy decision
    because it changes the log file entry format, which can break other
@@ -506,8 +465,6 @@
    which is extremely inefficient.  */
 #define FSYNC_ON_CLOSE 0
 
-#if HAVE_TAYLOR_LOGGING
-
 /* The default log file when using HAVE_TAYLOR_LOGGING.  When using
    HAVE_TAYLOR_CONFIG, this may be overridden by the ``logfile''
    command in the configuration file.  */
@@ -529,46 +486,3 @@
 /* #define DEBUGFILE "/var/spool/uucp/Debug" */
 /* #define DEBUGFILE "/var/log/uucp/Debug" */
 
-#endif /* HAVE_TAYLOR_LOGGING */
-
-#if HAVE_V2_LOGGING
-
-/* The default log file when using HAVE_V2_LOGGING.  When using
-   HAVE_TAYLOR_CONFIG, this may be overridden by the ``logfile''
-   command in the configuration file.  */
-#define LOGFILE "/usr/spool/uucp/LOGFILE"
-
-/* The default statistics file when using HAVE_V2_LOGGING.  When using
-   HAVE_TAYLOR_CONFIG, this may be overridden by the ``statfile''
-   command in the configuration file.  */
-#define STATFILE "/usr/spool/uucp/SYSLOG"
-
-/* The default debugging file when using HAVE_V2_LOGGING.  When using
-   HAVE_TAYLOR_CONFIG, this may be overridden by the ``debugfile''
-   command in the configuration file.  */
-#define DEBUGFILE "/usr/spool/uucp/DEBUG"
-
-#endif /* HAVE_V2_LOGGING */
-
-#if HAVE_HDB_LOGGING
-
-/* The default log file when using HAVE_HDB_LOGGING.  When using
-   HAVE_TAYLOR_CONFIG, this may be overridden by the ``logfile''
-   command in the configuration file.  The first %s in the string will
-   be replaced by the program name (e.g. uucico); the second %s will
-   be replaced by the system name (if there is no appropriate system,
-   "ANY" will be used).  No other '%' character may appear in the
-   string.  */
-#define LOGFILE "/usr/spool/uucp/.Log/%s/%s"
-
-/* The default statistics file when using HAVE_HDB_LOGGING.  When using
-   HAVE_TAYLOR_CONFIG, this may be overridden by the ``statfile''
-   command in the configuration file.  */
-#define STATFILE "/usr/spool/uucp/.Admin/xferstats"
-
-/* The default debugging file when using HAVE_HDB_LOGGING.  When using
-   HAVE_TAYLOR_CONFIG, this may be overridden by the ``debugfile''
-   command in the configuration file.  */
-#define DEBUGFILE "/usr/spool/uucp/.Admin/audit.local"
-
-#endif /* HAVE_HDB_LOGGING */
