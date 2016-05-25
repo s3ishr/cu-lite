@@ -3,7 +3,7 @@
 noinst_LIBRARIES = libunix.a
 
 libunix_a_SOURCES = access.c addbas.c app3.c app4.c basnam.c bytfre.c \
-	corrup.c chmod.c cohtty.c cusub.c cwd.c detach.c efopen.c epopen.c \
+	corrup.c chmod.c cusub.c cwd.c detach.c efopen.c epopen.c \
 	exists.c failed.c filnam.c fsusg.c indir.c init.c isdir.c \
 	isfork.c iswait.c jobid.c lcksys.c link.c locfil.c lock.c \
 	loctim.c mkdirs.c mode.c move.c opensr.c pause.c \
