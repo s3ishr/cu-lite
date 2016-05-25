@@ -71,13 +71,5 @@ zstemp_file (qsys)
   if (icount >= CDIGS * CDIGS)
     icount = 0;
 
-#if SPOOLDIR_V2 || SPOOLDIR_BSD42
-  return zbufcpy (ab);
-#endif
-#if SPOOLDIR_BSD43 || SPOOLDIR_ULTRIX || SPOOLDIR_TAYLOR
   return zsysdep_in_dir (".Temp", ab);
-#endif
-#if SPOOLDIR_HDB || SPOOLDIR_SVR4
-  return zsysdep_in_dir (qsys->uuconf_zname, ab);
-#endif
 }

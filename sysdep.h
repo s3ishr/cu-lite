@@ -44,10 +44,6 @@ struct sconnection;
  #error Terminal driver define not set or duplicated
 #endif
 
-#if SPOOLDIR_V2 + SPOOLDIR_BSD42 + SPOOLDIR_BSD43 + SPOOLDIR_HDB + SPOOLDIR_ULTRIX + SPOOLDIR_SVR4 + SPOOLDIR_TAYLOR != 1
- #error Spool directory define not set or duplicated
-#endif
-
 /* If setreuid is broken, don't use it.  */
 #if HAVE_BROKEN_SETREUID
 #undef HAVE_SETREUID

@@ -107,25 +107,7 @@ static char *
 zswork_directory (zsystem)
      const char *zsystem;
 {
-#if SPOOLDIR_V2
-  return zbufcpy (".");
-#endif /* SPOOLDIR_V2 */
-#if SPOOLDIR_BSD42 || SPOOLDIR_BSD43
-  return zbufcpy ("C.");
-#endif /* SPOOLDIR_BSD42 || SPOOLDIR_BSD43 */
-#if SPOOLDIR_HDB || SPOOLDIR_SVR4
-  return zbufcpy (zsystem);
-#endif /* SPOOLDIR_HDB || SPOOLDIR_SVR4 */
-#if SPOOLDIR_ULTRIX
-  return zsappend3 ("sys",
-		    (fsultrix_has_spool (zsystem)
-		     ? zsystem
-		     : "DEFAULT"),
-		    "C.");
-#endif /* SPOOLDIR_ULTRIX */
-#if SPOOLDIR_TAYLOR
   return zsysdep_in_dir (zsystem, "C.");
-#endif /* SPOOLDIR_TAYLOR */
 }
 
 /* See whether a file name from the directory returned by
@@ -139,52 +121,12 @@ fswork_file (zsystem, zfile, pbgrade)
      const char *zfile;
      char *pbgrade;
 {
-#if SPOOLDIR_V2 || SPOOLDIR_BSD42 || SPOOLDIR_BSD43 || SPOOLDIR_ULTRIX
-  int cfilesys, csys;
-
-  /* The file name should be C.ssssssgqqqq, where g is exactly one
-     letter and qqqq is exactly four numbers.  The system name may be
-     truncated to six or seven characters.  The system name of the
-     file must match the system name we're looking for, since there
-     could be work files for several systems in one directory.  */
-  if (zfile[0] != 'C' || zfile[1] != '.')
-    return FALSE;
-  csys = strlen (zsystem);
-  cfilesys = strlen (zfile) - 7;
-  if (csys != cfilesys
-      && (csys < 6 || (cfilesys != 6 && cfilesys != 7)))
-    return FALSE;
-  *pbgrade = zfile[cfilesys + 2];
-  return strncmp (zfile + 2, zsystem, cfilesys) == 0;
-#endif /* V2 || BSD42 || BSD43 || ULTRIX */
-#if SPOOLDIR_HDB || SPOOLDIR_SVR4
-  int clen;
-
-  /* The HDB file name should be C.ssssssgqqqq where g is exactly one
-     letter and qqqq is exactly four numbers or letters.  We don't
-     check the system name, because it is guaranteed by the directory
-     we are looking in and some versions of uucp set it to the local
-     system rather than the remote one.  I'm not sure of the exact
-     format of the SVR4 file name, but it does not include the grade
-     at all.  */
-  if (zfile[0] != 'C' || zfile[1] != '.')
-    return FALSE;
-  clen = strlen (zfile);
-  if (clen < 7)
-    return FALSE;
-#if ! SPOOLDIR_SVR4
-  *pbgrade = zfile[clen - 5];
-#endif
-  return TRUE;
-#endif /* SPOOLDIR_HDB || SPOOLDIR_SVR4 */
-#if SPOOLDIR_TAYLOR
   /* We don't keep the system name in the file name, since that
      forces truncation.  Our file names are always C.gqqqq.  */
   *pbgrade = zfile[2];
   return (zfile[0] == 'C'
 	  && zfile[1] == '.'
 	  && zfile[2] != '\0');
-#endif /* SPOOLDIR_TAYLOR */
 }
 
 /* A comparison function to look through the list of file names.  */
@@ -209,10 +151,6 @@ fsysdep_has_work (qsys)
   char *zdir;
   DIR *qdir;
   struct dirent *qentry;
-#if SPOOLDIR_SVR4
-  DIR *qgdir;
-  struct dirent *qgentry;
-#endif
 
   zdir = zswork_directory (qsys->uuconf_zname);
   if (zdir == NULL)
@@ -224,22 +162,6 @@ fsysdep_has_work (qsys)
       return FALSE;
     }
 
-#if SPOOLDIR_SVR4
-  qgdir = qdir;
-  while ((qgentry = readdir (qgdir)) != NULL)
-    {
-      char *zsub;
-
-      if (qgentry->d_name[0] == '.'
-	  || qgentry->d_name[1] != '\0')
-	continue;
-      zsub = zsysdep_in_dir (zdir, qgentry->d_name);
-      qdir = opendir (zsub);
-      ubuffree (zsub);
-      if (qdir == NULL)
-	continue;
-#endif
-
       while ((qentry = readdir (qdir)) != NULL)
 	{
 	  char bgrade;
@@ -247,19 +169,10 @@ fsysdep_has_work (qsys)
 	  if (fswork_file (qsys->uuconf_zname, qentry->d_name, &bgrade))
 	    {
 	      closedir (qdir);
-#if SPOOLDIR_SVR4
-	      closedir (qgdir);
-#endif
 	      ubuffree (zdir);
 	      return TRUE;
 	    }
 	}
-
-#if SPOOLDIR_SVR4
-      closedir (qdir);
-    }
-  qdir = qgdir;
-#endif
 
   closedir (qdir);
   ubuffree (zdir);
@@ -286,10 +199,6 @@ fsysdep_get_work_init (qsys, bgrade, cmax)
   struct dirent *qentry;
   size_t chad;
   size_t callocated;
-#if SPOOLDIR_SVR4
-  DIR *qgdir;
-  struct dirent *qgentry;
-#endif
 
   zdir = zswork_directory (qsys->uuconf_zname);
   if (zdir == NULL)
@@ -325,46 +234,13 @@ fsysdep_get_work_init (qsys, bgrade, cmax)
     qsort ((pointer) asSwork_files, chad, sizeof (struct ssfilename),
 	   iswork_cmp);
 
-#if SPOOLDIR_SVR4
-  qgdir = qdir;
-  while ((qgentry = readdir (qgdir)) != NULL)
-    {
-      char *zsub;
-
-      if (qgentry->d_name[0] == '.'
-	  || qgentry->d_name[1] != '\0'
-	  || UUCONF_GRADE_CMP (bgrade, qgentry->d_name[0]) < 0)
-	continue;
-      zsub = zsysdep_in_dir (zdir, qgentry->d_name);
-      qdir = opendir (zsub);
-      if (qdir == NULL)
-	{
-	  if (errno != ENOTDIR && errno != ENOENT)
-	    {
-	      ulog (LOG_ERROR, "opendir (%s): %s", zsub,
-		    strerror (errno));
-	      ubuffree (zsub);
-	      return FALSE;
-	    }
-	  ubuffree (zsub);
-	  continue;
-	}
-      ubuffree (zsub);
-#endif
-
       while ((qentry = readdir (qdir)) != NULL)
 	{
 	  char bfilegrade;
 	  char *zname;
 	  struct ssfilename slook;
 
-#if ! SPOOLDIR_SVR4
 	  zname = zbufcpy (qentry->d_name);
-#else
-	  zname = zsysdep_in_dir (qgentry->d_name, qentry->d_name);
-	  bfilegrade = qgentry->d_name[0];
-#endif
-
 	  slook.zfile = zname;
 	  if (! fswork_file (qsys->uuconf_zname, qentry->d_name,
 			     &bfilegrade)
@@ -397,14 +273,6 @@ fsysdep_get_work_init (qsys, bgrade, cmax)
 		break;
 	    }
 	}
-
-#if SPOOLDIR_SVR4
-      closedir (qdir);
-      if (cmax != 0 && cSwork_files - chad > cmax)
-	break;
-    }
-  qdir = qgdir;
-#endif
 
   closedir (qdir);
   ubuffree (zdir);
@@ -773,15 +641,7 @@ bsgrade (pseq)
 
   zfile = ((struct ssline *) pseq)->qfile->zfile;
 
-#if SPOOLDIR_TAYLOR
   bgrade = *(strrchr (zfile, '/') + 3);
-#else
-#if ! SPOOLDIR_SVR4
-  bgrade = zfile[strlen (zfile) - CSEQLEN - 1];
-#else
-  bgrade = *(strchr (zfile, '/') + 1);
-#endif
-#endif
 
   return bgrade;
 }

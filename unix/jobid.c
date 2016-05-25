@@ -43,20 +43,6 @@ zsfile_to_jobid (qsys, zfile, bgrade)
 
   clen = strlen (qsys->uuconf_zname);
 
-#if ! SPOOLDIR_TAYLOR
-
-  /* We use the system name attached to the grade and sequence number.
-     This won't work correctly if the file name was actually created
-     by some other version of uucp that uses a different length for
-     the sequence number.  Too bad.  */
-
-  zret = zbufalc (clen + CSEQLEN + 2);
-  memcpy (zret, qsys->uuconf_zname, clen);
-  zret[clen] = bgrade;
-  memcpy (zret + clen + 1, zfile + strlen (zfile) - CSEQLEN, CSEQLEN + 1);
-
-#else
-
   /* We use the system name followed by a dot, the grade, and the
      sequence number.  In this case, the sequence number is a long
      string.  */
@@ -84,8 +70,6 @@ zsfile_to_jobid (qsys, zfile, bgrade)
     memcpy (zret + clen, zfile, cseqlen + 1);
   }
 
-#endif
-
   return zret;
 }
 
@@ -97,41 +81,6 @@ zsjobid_to_file (zid, pzsystem, pbgrade)
      char **pzsystem;
      char *pbgrade;
 {
-#if ! SPOOLDIR_TAYLOR
-  size_t clen;
-  const char *zend;
-  char *zsys;
-  char abname[CSEQLEN + 11];
-  char *zret;
-
-  clen = strlen (zid);
-  if (clen <= CSEQLEN)
-    {
-      ulog (LOG_ERROR, "%s: Bad job id", zid);
-      return NULL;
-    }
-
-  zend = zid + clen - CSEQLEN - 1;
-
-  zsys = zbufalc (clen - CSEQLEN);
-  memcpy (zsys, zid, clen - CSEQLEN - 1);
-  zsys[clen - CSEQLEN - 1] = '\0';
-
-  /* This must correspond to zsfile_name.  */
-  sprintf (abname, "C.%.7s%s", zsys, zend);
-
-  zret = zsfind_file (abname, zsys, *zend);
-
-  if (zret != NULL && pzsystem != NULL)
-    *pzsystem = zsys;
-  else
-    ubuffree (zsys);
-
-  if (pbgrade != NULL)
-    *pbgrade = *zend;
-
-  return zret;
-#else /* SPOOLDIR_TAYLOR */
   char *zdot;
   size_t csyslen;
   char *zsys;
@@ -164,5 +113,4 @@ zsjobid_to_file (zid, pzsystem, pbgrade)
     *pbgrade = zdot[1];
 
   return zret;
-#endif /* SPOOLDIR_TAYLOR */
 }

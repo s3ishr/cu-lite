@@ -31,26 +31,9 @@
 
 #include <errno.h>
 #include <ctype.h>
-
-#if SPOOLDIR_HDB || SPOOLDIR_SVR4
-
-/* If we are using HDB spool layout, store status using HDB status
-   values.  SVR4 is a variant of HDB.  */
-
-#define MAP_STATUS 1
-
-static const int aiMapstatus[] =
-{
-  0, 13, 7, 6, 20, 4, 3, 2
-};
-#define CMAPENTRIES (sizeof (aiMapstatus) / sizeof (aiMapstatus[0]))
-
-#else /* ! SPOOLDIR_HDB && ! SPOOLDIR_SVR4 */
 
 #define MAP_STATUS 0
 
-#endif /* ! SPOOLDIR_HDB && ! SPOOLDIR_SVR4 */
-
 /* Get the status of a system.  This assumes that we are in the spool
    directory.  */
 
@@ -230,11 +213,7 @@ fsysdep_set_status (qsys, qset)
   fprintf (e, "%d %d %ld %d ", istat, qset->cretries, qset->ilast,
 	   qset->cwait);
 
-#if SPOOLDIR_SVR4
-  fprintf (e, "\"%s\"", azStatus[(int) qset->ttype]);
-#else
   fprintf (e, "%s", azStatus[(int) qset->ttype]);
-#endif
 
   fprintf (e, " %s\n", qsys->uuconf_zname);
   if (fclose (e) != 0)

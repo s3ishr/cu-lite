@@ -126,27 +126,8 @@ fscmd_seq (zsystem, zseq)
 #endif
 
   zfree = NULL;
-
-#if SPOOLDIR_V2 || SPOOLDIR_BSD42 || SPOOLDIR_BSD43
-  zfile = "SEQF";
-#endif
-#if SPOOLDIR_HDB || SPOOLDIR_SVR4
-  zfree = zsysdep_in_dir (".Sequence", zsystem);
-  zfile = zfree;
-#endif
-#if SPOOLDIR_ULTRIX
-  if (! fsultrix_has_spool (zsystem))
-    zfile = "sys/DEFAULT/.SEQF";
-  else
-    {
-      zfree = zsappend3 ("sys", zsystem, ".SEQF");
-      zfile = zfree;
-    }
-#endif /* SPOOLDIR_ULTRIX */
-#if SPOOLDIR_TAYLOR
   zfree = zsysdep_in_dir (zsystem, "SEQF");
   zfile = zfree;
-#endif /* SPOOLDIR_TAYLOR */
 
 #ifdef O_CREAT
   o = open ((char *) zfile, O_RDWR | O_CREAT | O_NOCTTY, IPRIVATE_FILE_MODE);
@@ -271,15 +252,6 @@ fscmd_seq (zsystem, zseq)
      On Ultrix, arbitrary characters are allowed in the sequence
      number.  On other systems, the sequence number apparently must be
      in hex.  */
-#if SPOOLDIR_V2 || SPOOLDIR_BSD42 || SPOOLDIR_BSD43 || SPOOLDIR_HDB || SPOOLDIR_SVR4
-  i = (int) strtol (zseq, (char **) NULL, 16);
-  ++i;
-  if (i > 0xffff)
-    i = 0;
-  /* The sprintf argument has CSEQLEN built into it.  */
-  sprintf (zseq, "%04x", (unsigned int) i);
-#endif
-#if SPOOLDIR_ULTRIX || SPOOLDIR_TAYLOR
   for (i = CSEQLEN - 1; i >= 0; i--)
     {
       const char *zdig;
@@ -293,7 +265,6 @@ fscmd_seq (zsystem, zseq)
 	  break;
 	}
     }
-#endif /* SPOOLDIR_ULTRIX || SPOOLDIR_TAYLOR */
 
   fret = TRUE;
 
@@ -353,32 +324,14 @@ zsfile_name (btype, zsystem, zlocalname, bgrade, fxqt, ztname, zdname, zxname)
 
       if (btype == 'C')
 	{
-#if ! SPOOLDIR_TAYLOR
-	  sprintf (absimple, "C.%.7s%c%s", zsystem, bgrade, abseq);
-#else
 	  sprintf (absimple, "C.%c%s", bgrade, abseq);
-#endif
 	}
       else if (btype == 'D')
 	{
-	  /* This name doesn't really matter that much; it's just the
-	     name we use on the local system.  The name we use on the
-	     remote system, which we return in zdname, should contain
-	     our system name so that remote UUCP's running SPOOLDIR_V2
-	     and the like can distinguish while files come from which
-	     systems.  */
-#if SPOOLDIR_SVR4
-	  sprintf (absimple, "D.%.7s%c%s", zsystem, bgrade, abseq);
-#else /* ! SPOOLDIR_SVR4 */
-#if ! SPOOLDIR_TAYLOR
-	  sprintf (absimple, "D.%.7s%c%s", zlocalname, bgrade, abseq);
-#else /* SPOOLDIR_TAYLOR */
 	  if (fxqt)
 	    sprintf (absimple, "D.X%s", abseq);
 	  else
 	    sprintf (absimple, "D.%s", abseq);
-#endif /* SPOOLDIR_TAYLOR */
-#endif /* ! SPOOLDIR_HDB && ! SPOOLDIR_SVR4 */
 	}
 #if DEBUG > 0
       else
@@ -434,12 +387,6 @@ zsysdep_data_file_name (qsys, zlocalname, bgrade, fxqt, ztname, zdname,
 		      ztname, zdname, zxname);
 }
 
-#if SPOOLDIR_TAYLOR
-
-/* Write out a number in base 62 into a given number of characters,
-   right justified with zero fill.  This is used by zscmd_file if
-   SPOOLDIR_TAYLOR.  */
-
 static void usput62 P((long i, char *, int c));
 
 static void
@@ -463,8 +410,6 @@ usput62 (i, z, c)
     }
 }
 
-#endif /* SPOOLDIR_TAYLOR */
-
 /* Get a command file name.  */
 
 char *
@@ -472,11 +417,6 @@ zscmd_file (qsys, bgrade)
      const struct uuconf_system *qsys;
      int bgrade;
 {
-#if ! SPOOLDIR_TAYLOR
-  return zsfile_name ('C', qsys->uuconf_zname, (const char *) NULL,
-		      bgrade, FALSE, (char *) NULL, (char *) NULL,
-		      (char *) NULL);
-#else
   char *zname;
   long isecs, imicros;
   pid_t ipid;
@@ -548,8 +488,6 @@ zscmd_file (qsys, bgrade)
     }
 
   return zname;
-
-#endif
 }
 
 /* Return a name for an execute file to be created locally.  This is
