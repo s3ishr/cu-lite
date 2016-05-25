@@ -29,7 +29,7 @@ cu_SOURCES = cu.h cu.c prot.c log.c chat.c conn.c copy.c $(UUHEADERS)
 
 uuconv_CFLAGS = -I$(srcdir)/uuconf $(AM_CFLAGS)
 
-EXTRA_DIST = cu.1 uucp.1 contrib sample
+EXTRA_DIST = cu.1 contrib sample
 
 dist-hook:
 	-rm -rf $(distdir)/contrib/CVS $(distdir)/sample/CVS
