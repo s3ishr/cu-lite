@@ -1031,9 +1031,6 @@ fsserial_open (qconn, ibaud, fwait, fuser, tlocal)
 
   if (q->zdevice != NULL)
     {
-#if LOG_DEVICE_PREFIX
-      ulog_device (q->zdevice);
-#else
       const char *z;
 
       if (strncmp (q->zdevice, "/dev/", sizeof "/dev/" - 1) == 0)
@@ -1041,7 +1038,6 @@ fsserial_open (qconn, ibaud, fwait, fuser, tlocal)
       else
 	z = q->zdevice;
       ulog_device (z);
-#endif
     }
   else
     {

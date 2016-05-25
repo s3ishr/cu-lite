@@ -366,27 +366,6 @@
    not used.  */
 #define BDEFAULT_UUX_GRADE ('N')
 
-/* If QNX_LOG_NODE_ID is set to 1, log messages will include the QNX
-   node ID just after the process ID.  This is a policy decision
-   because it changes the log file entry format, which can break other
-   programs (e.g., some of the ones in the contrib directory) which
-   expect to read the standard log file format.  */
-#ifdef __QNX__
-#define QNX_LOG_NODE_ID 1
-#else
-#define QNX_LOG_NODE_ID 0
-#endif
-
-/* If LOG_DEVICE_PREFIX is 1, log messages will give the full
-   pathname of a device rather than just the final component.  This is
-   important because on QNX //2/dev/ser2 refers to a different device
-   than //4/dev/ser2.  */
-#ifdef __QNX__
-#define LOG_DEVICE_PREFIX 1
-#else
-#define LOG_DEVICE_PREFIX 0
-#endif
-
 /* If you would like the log, debugging and statistics files to be
    closed after each message, set CLOSE_LOGFILES to 1.  This will
    permit the log files to be easily moved.  If a log file does not

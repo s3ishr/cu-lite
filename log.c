@@ -435,11 +435,6 @@ ulog (ttype, zmsg, a, b, c, d, f, g, h, i, j)
               zset += strlen (zset);
             }
 
-#if QNX_LOG_NODE_ID
-          sprintf (zset, " %ld", (long) getnid ());
-          zset += strlen (zset);
-#endif
-
           *zset++ = ')';
           *zset++ = ' ';
 
