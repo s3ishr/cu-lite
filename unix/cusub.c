@@ -763,11 +763,9 @@ static sterminal sSterm_orig;
 /* The new state of the terminal.  */
 static sterminal sSterm_new;
 
-#if ! HAVE_BSD_TTY
 #ifdef SIGTSTP
 /* Whether SIGTSTP is being ignored.  */
 static boolean fStstp_ignored;
-#endif
 #endif
 
 /* Set the terminal into raw mode.  */
@@ -792,59 +790,6 @@ fsysdep_terminal_raw (flocalecho)
   
   sSterm_new = sSterm_orig;
 
-#if HAVE_BSD_TTY
-
-  /* We use CBREAK mode rather than RAW mode, because RAW mode turns
-     off all output processing, which we don't want to do.  This means
-     that we have to disable the interrupt characters, which we do by
-     setting them to -1.  */
-  bSeof = sSterm_orig.stchars.t_eofc;
-
-  sSterm_new.stchars.t_intrc = -1;
-  sSterm_new.stchars.t_quitc = -1;
-  sSterm_new.stchars.t_startc = -1;
-  sSterm_new.stchars.t_stopc = -1;
-  sSterm_new.stchars.t_eofc = -1;
-  sSterm_new.stchars.t_brkc = -1;
-
-  bStstp = sSterm_orig.sltchars.t_suspc;
-
-  sSterm_new.sltchars.t_suspc = -1;
-  sSterm_new.sltchars.t_dsuspc = -1;
-  sSterm_new.sltchars.t_rprntc = -1;
-  sSterm_new.sltchars.t_flushc = -1;
-  sSterm_new.sltchars.t_werasc = -1;
-  sSterm_new.sltchars.t_lnextc = -1;
-
-  if (! flocalecho)
-    {
-      sSterm_new.stty.sg_flags |= (CBREAK | ANYP);
-      sSterm_new.stty.sg_flags &=~ (ECHO | CRMOD | TANDEM);
-    }
-  else
-    {
-      sSterm_new.stty.sg_flags |= (CBREAK | ANYP | ECHO);
-      sSterm_new.stty.sg_flags &=~ (CRMOD | TANDEM);
-    }
-
-#endif /* HAVE_BSD_TTY */
-
-#if HAVE_SYSV_TERMIO
-
-  bSeof = sSterm_new.c_cc[VEOF];
-  if (! flocalecho)
-    sSterm_new.c_lflag &=~ (ICANON | ISIG | ECHO | ECHOE | ECHOK | ECHONL);
-  else
-    sSterm_new.c_lflag &=~ (ICANON | ISIG);
-  sSterm_new.c_iflag &=~ (INLCR | IGNCR | ICRNL | IXON | IXOFF | IXANY);
-  sSterm_new.c_oflag &=~ (OPOST);
-  sSterm_new.c_cc[VMIN] = 1;
-  sSterm_new.c_cc[VTIME] = 0;
-
-#endif /* HAVE_SYSV_TERMIO */
-
-#if HAVE_POSIX_TERMIOS
-
   bSeof = sSterm_new.c_cc[VEOF];
   bStstp = sSterm_new.c_cc[VSUSP];
   if (! flocalecho)
@@ -856,8 +801,6 @@ fsysdep_terminal_raw (flocalecho)
   sSterm_new.c_oflag &=~ (OPOST);
   sSterm_new.c_cc[VMIN] = 1;
   sSterm_new.c_cc[VTIME] = 0;
-
-#endif /* HAVE_POSIX_TERMIOS */
 
   if (! fsetterminfo (0, &sSterm_new))
     {
@@ -1058,21 +1001,6 @@ boolean
 fsysdep_terminal_signals (faccept)
      boolean faccept;
 {
-#if HAVE_BSD_TTY
-
-  if (faccept)
-    {
-      sSterm_new.stchars.t_intrc = sSterm_orig.stchars.t_intrc;
-      sSterm_new.stchars.t_quitc = sSterm_orig.stchars.t_quitc;
-    }
-  else
-    {
-      sSterm_new.stchars.t_intrc = -1;
-      sSterm_new.stchars.t_quitc = -1;
-    }
-
-#else /* ! HAVE_BSD_TTY */
-
   if (faccept)
     sSterm_new.c_lflag |= ISIG;
   else
@@ -1088,8 +1016,6 @@ fsysdep_terminal_signals (faccept)
   else if (! fStstp_ignored)
     usset_signal (SIGTSTP, SIG_DFL, TRUE, (boolean *) NULL);
 #endif
-
-#endif /* ! HAVE_BSD_TTY */
 
   if (! fsetterminfo (0, &sSterm_new))
     {

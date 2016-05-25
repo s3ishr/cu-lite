@@ -47,44 +47,6 @@
    rotten, you should leave this as 1.  */
 #define USE_STDIO 1
 
-/* Exactly one of the following macros must be set to 1.  Many modern
-   systems support more than one of these choices through some form of
-   compilation environment, in which case the setting will depend on
-   the compilation environment you use.  If you have a reasonable
-   choice between options, I suspect that TERMIO or TERMIOS will be
-   more efficient than TTY, but I have not done any head to head
-   comparisons.
-
-   If you don't set any of these macros, the code below will guess.
-   It will doubtless be wrong on some systems.
-
-   HAVE_BSD_TTY -- Use the 4.2BSD tty routines
-   HAVE_SYSV_TERMIO -- Use the System V termio routines
-   HAVE_POSIX_TERMIOS -- Use the POSIX termios routines
-   */
-#define HAVE_BSD_TTY 0
-#define HAVE_SYSV_TERMIO 0
-#define HAVE_POSIX_TERMIOS 0
-
-/* This code tries to guess which terminal driver to use if you did
-   not make a choice above.  It is in this file to make it easy to
-   figure out what's happening if something goes wrong.  */
-
-#if HAVE_BSD_TTY + HAVE_SYSV_TERMIO + HAVE_POSIX_TERMIOS == 0
-#if HAVE_TERMIOS_H
-#undef HAVE_POSIX_TERMIOS
-#define HAVE_POSIX_TERMIOS 1
-#else /* ! HAVE_TERMIOS_H */
-#if HAVE_CBREAK
-#undef HAVE_BSD_TTY
-#define HAVE_BSD_TTY 1
-#else /* ! HAVE_CBREAK */
-#undef HAVE_SYSV_TERMIO
-#define HAVE_SYSV_TERMIO 1
-#endif /* ! HAVE_CBREAK */
-#endif /* ! HAVE_TERMIOS_H */
-#endif /* HAVE_BSD_TTY + HAVE_SYSV_TERMIO + HAVE_POSIX_TERMIOS == 0 */
-
 /* On some systems a write to a serial port will block even if the
    file descriptor has been set to not block.  File transfer can be
    more efficient if the package knows that a write to the serial port

@@ -33,10 +33,6 @@ struct uuconf_system;
 struct sconnection;
 #endif
 
-#if HAVE_BSD_TTY + HAVE_SYSV_TERMIO + HAVE_POSIX_TERMIOS != 1
- #error Terminal driver define not set or duplicated
-#endif
-
 /* If setreuid is broken, don't use it.  */
 #if HAVE_BROKEN_SETREUID
 #undef HAVE_SETREUID
@@ -153,38 +149,6 @@ extern volatile jmp_buf sSjmp_buf;
 
 /* Get definitions for the terminal driver.  */
 
-#if HAVE_BSD_TTY
-#include <sgtty.h>
-struct sbsd_terminal
-{
-  struct sgttyb stty;
-  struct tchars stchars;
-  struct ltchars sltchars;
-};
-typedef struct sbsd_terminal sterminal;
-#define fgetterminfo(o, q) \
-  (ioctl ((o), TIOCGETP, &(q)->stty) == 0 \
-   && ioctl ((o), TIOCGETC, &(q)->stchars) == 0 \
-   && ioctl ((o), TIOCGLTC, &(q)->sltchars) == 0)
-#define fsetterminfo(o, q) \
-  (ioctl ((o), TIOCSETN, &(q)->stty) == 0 \
-   && ioctl ((o), TIOCSETC, &(q)->stchars) == 0 \
-   && ioctl ((o), TIOCSLTC, &(q)->sltchars) == 0)
-#define fsetterminfodrain(o, q) \
-  (ioctl ((o), TIOCSETP, &(q)->stty) == 0 \
-   && ioctl ((o), TIOCSETC, &(q)->stchars) == 0 \
-   && ioctl ((o), TIOCSLTC, &(q)->sltchars) == 0)
-#endif /* HAVE_BSD_TTY */
-
-#if HAVE_SYSV_TERMIO
-#include <termio.h>
-typedef struct termio sterminal;
-#define fgetterminfo(o, q) (ioctl ((o), TCGETA, (q)) == 0)
-#define fsetterminfo(o, q) (ioctl ((o), TCSETA, (q)) == 0)
-#define fsetterminfodrain(o, q) (ioctl ((o), TCSETAW, (q)) == 0)
-#endif /* HAVE_SYSV_TERMIO */
-
-#if HAVE_POSIX_TERMIOS
 #include <termios.h>
 typedef struct termios sterminal;
 #define fgetterminfo(o, q) (tcgetattr ((o), (q)) == 0)
@@ -198,8 +162,6 @@ typedef struct termios sterminal;
 #undef HAVE_SYS_IOCTL_H
 #define HAVE_SYS_IOCTL_H 0
 #endif
-
-#endif /* HAVE_POSIX_TERMIOS */
 
 /* The root directory (this is needed by the system independent stuff
    as the default for local-send).  */

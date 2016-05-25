@@ -96,10 +96,6 @@ const char serial_rcsid[] = "$Id: serial.c,v 1.78 2002/03/05 19:10:42 ian Rel $"
 #endif
 #endif
 
-#if HAVE_STRIP_BUG && HAVE_BSD_TTY
-#include <termio.h>
-#endif
-
 #if HAVE_DEV_INFO
 #include <sys/dev.h>
 #endif
@@ -168,9 +164,6 @@ extern int t_errno;
 extern char *t_errlist[];
 extern int t_nerr;
 #endif
-
-/* Determine bits to clear for the various terminal control fields for
-   HAVE_SYSV_TERMIO and HAVE_POSIX_TERMIOS.  */
 
 /* These fields are defined on some systems, and I am told that it
    does not hurt to clear them, and it sometimes helps.  */
@@ -182,19 +175,6 @@ extern int t_nerr;
 #define PENDIN 0
 #endif
 
-#if HAVE_SYSV_TERMIO
-#define ICLEAR_IFLAG (IGNBRK | BRKINT | IGNPAR | PARMRK | INPCK \
-		      | ISTRIP | INLCR | IGNCR | ICRNL | IUCLC \
-		      | IXON | IXANY | IXOFF | IMAXBEL)
-#define ICLEAR_OFLAG (OPOST | OLCUC | ONLCR | OCRNL | ONOCR | ONLRET \
-		      | OFILL | OFDEL | NLDLY | CRDLY | TABDLY | BSDLY \
-		      | VTDLY | FFDLY)
-#define ICLEAR_CFLAG (CBAUD | CSIZE | PARENB | PARODD)
-#define ISET_CFLAG (CS8 | CREAD | HUPCL)
-#define ICLEAR_LFLAG (ISIG | ICANON | XCASE | ECHO | ECHOE | ECHOK \
-		      | ECHONL | NOFLSH | PENDIN)
-#endif
-#if HAVE_POSIX_TERMIOS
 #define ICLEAR_IFLAG (BRKINT | ICRNL | IGNBRK | IGNCR | IGNPAR \
 		      | INLCR | INPCK | ISTRIP | IXOFF | IXON \
 		      | PARMRK | IMAXBEL)
@@ -203,7 +183,6 @@ extern int t_nerr;
 #define ISET_CFLAG (CS8 | CREAD | HUPCL)
 #define ICLEAR_LFLAG (ECHO | ECHOE | ECHOK | ECHONL | ICANON | IEXTEN \
 		      | ISIG | NOFLSH | TOSTOP | PENDIN)
-#endif
 
 enum tclocal_setting
 {
@@ -766,11 +745,7 @@ fsserial_unlock (qconn)
 
 /* A table to map baud rates into index numbers.  */
 
-#if HAVE_POSIX_TERMIOS
 typedef speed_t baud_code;
-#else
-typedef int baud_code;
-#endif
 
 static struct sbaud_table
 {
@@ -866,11 +841,9 @@ static struct sbaud_table
 
 #define CBAUD_TABLE (sizeof asSbaud_table / sizeof asSbaud_table[0])
 
-#if HAVE_SYSV_TERMIO || HAVE_POSIX_TERMIOS
 /* Hold the MIN value for the terminal to avoid setting it
    unnecessarily.  */
 static int cSmin;
-#endif /* HAVE_SYSV_TERMIO || HAVE_POSIX_TERMIOS */
 
 /* Open a serial line.  This sets the terminal settings.  We begin in
    seven bit mode and let the protocol change if necessary.  If fwait
@@ -1009,89 +982,6 @@ fsserial_open (qconn, ibaud, fwait, fuser, tlocal)
 
   q->snew = q->sorig;
 
-#if HAVE_BSD_TTY
-
-  q->snew.stty.sg_flags = RAW | ANYP;
-  if (ibaud == 0)
-    ib = q->snew.stty.sg_ospeed;
-  else
-    {
-      q->snew.stty.sg_ispeed = ib;
-      q->snew.stty.sg_ospeed = ib;
-    }
-
-  /* We don't want to receive any interrupt characters.  */
-  q->snew.stchars.t_intrc = -1;
-  q->snew.stchars.t_quitc = -1;
-  q->snew.stchars.t_eofc = -1;
-  q->snew.stchars.t_brkc = -1;
-  q->snew.sltchars.t_suspc = -1;
-  q->snew.sltchars.t_rprntc = -1;
-  q->snew.sltchars.t_dsuspc = -1;
-  q->snew.sltchars.t_flushc = -1;
-  q->snew.sltchars.t_werasc = -1;
-  q->snew.sltchars.t_lnextc = -1;
-
-#ifdef NTTYDISC
-  /* We want to use the ``new'' terminal driver so that we can use the
-     local mode bits to control XON/XOFF.  */
-  {
-    int iparam;
-
-    if (ioctl (q->o, TIOCGETD, &iparam) >= 0
-	&& iparam != NTTYDISC)
-      {
-	iparam = NTTYDISC;
-	(void) ioctl (q->o, TIOCSETD, &iparam);
-      }
-  }
-#endif
-
-#ifdef TIOCHPCL
-  /* When the file is closed, hang up the line.  This is a safety
-     measure in case the program crashes.  */
-  (void) ioctl (q->o, TIOCHPCL, 0);
-#endif
-
-#ifdef TIOCFLUSH
-  {
-    int iparam;
-
-    /* Flush pending input.  */
-#ifdef FREAD
-    iparam = FREAD;
-#else
-    iparam = 0;
-#endif
-    (void) ioctl (q->o, TIOCFLUSH, &iparam);
-  }
-#endif /* TIOCFLUSH */
-
-#endif /* HAVE_BSD_TTY */
-
-#if HAVE_SYSV_TERMIO
-
-  if (ibaud == 0)
-    ib = q->snew.c_cflag & CBAUD;
-
-  q->snew.c_iflag &=~ ICLEAR_IFLAG;
-  q->snew.c_oflag &=~ ICLEAR_OFLAG;
-  q->snew.c_cflag &=~ ICLEAR_CFLAG;
-  q->snew.c_cflag |= ib | ISET_CFLAG;
-  q->snew.c_lflag &=~ ICLEAR_LFLAG;
-  cSmin = 1;
-  q->snew.c_cc[VMIN] = cSmin;
-  q->snew.c_cc[VTIME] = 1;
-
-#ifdef TCFLSH
-  /* Flush pending input.  */
-  (void) ioctl (q->o, TCFLSH, 0);
-#endif
-
-#endif /* HAVE_SYSV_TERMIO */
-
-#if HAVE_POSIX_TERMIOS
-
   if (ibaud == 0)
     ib = cfgetospeed (&q->snew);
 
@@ -1110,9 +1000,6 @@ fsserial_open (qconn, ibaud, fwait, fuser, tlocal)
   /* Flush pending input.  */
   (void) tcflush (q->o, TCIFLUSH);
 
-#endif /* HAVE_POSIX_TERMIOS */
-
-#if HAVE_SYSV_TERMIO || HAVE_POSIX_TERMIOS
   switch (tlocal)
     {
     case SET_CLOCAL:
@@ -1124,7 +1011,6 @@ fsserial_open (qconn, ibaud, fwait, fuser, tlocal)
     case IGNORE_CLOCAL:
       break;
     }
-#endif /* HAVE_SYSV_TERMIO || HAVE_POSIX_TERMIOS */
 
   if (! fsetterminfo (q->o, &q->snew))
     {
@@ -1498,16 +1384,7 @@ fsmodem_close (qconn, puuconf, qdialer, fsuccess)
      while draining output.  */
   if (qsysdep->fterminal)
     {
-#if HAVE_BSD_TTY
-      qsysdep->snew.stty.sg_ispeed = B0;
-      qsysdep->snew.stty.sg_ospeed = B0;
-#endif
-#if HAVE_SYSV_TERMIO
-      qsysdep->snew.c_cflag = (qsysdep->snew.c_cflag &~ CBAUD) | B0;
-#endif
-#if HAVE_POSIX_TERMIOS
       (void) cfsetospeed (&qsysdep->snew, B0);
-#endif
 
       fSalarm = FALSE;
 
@@ -1586,16 +1463,7 @@ fsysdep_modem_begin_dial (qconn, qdial)
 
 	  sbaud = qsysdep->snew;
 
-#if HAVE_BSD_TTY
-	  sbaud.stty.sg_ispeed = B0;
-	  sbaud.stty.sg_ospeed = B0;
-#endif
-#if HAVE_SYSV_TERMIO
-	  sbaud.c_cflag = (sbaud.c_cflag &~ CBAUD) | B0;
-#endif
-#if HAVE_POSIX_TERMIOS
 	  (void) cfsetospeed (&sbaud, B0);
-#endif
 
 	  (void) fsetterminfodrain (qsysdep->o, &sbaud);
 	  sleep (2);
@@ -1683,24 +1551,6 @@ fsmodem_carrier (qconn, fcarrier)
 	    }
 #endif /* TIOCCAR */
 
-#if HAVE_BSD_TTY
-#ifdef LNOMDM
-	  /* IS68K Unix uses a local LNOMDM bit.  */
-	  {
-	    int iparam;
-
-	    iparam = LNOMDM;
-	    if (ioctl (q->o, TIOCLBIC, &iparam) < 0)
-	      {
-		ulog (LOG_ERROR, "ioctl (TIOCLBIC, LNOMDM): %s",
-		      strerror (errno));
-		return FALSE;
-	      }
-	  }
-#endif /* LNOMDM */
-#endif /* HAVE_BSD_TTY */
-
-#if HAVE_SYSV_TERMIO || HAVE_POSIX_TERMIOS
 	  /* Put the modem into nonlocal mode.  */
 	  q->snew.c_cflag &=~ CLOCAL;
 	  if (! fsetterminfo (q->o, &q->snew))
@@ -1708,7 +1558,6 @@ fsmodem_carrier (qconn, fcarrier)
 	      ulog (LOG_ERROR, "Can't clear CLOCAL: %s", strerror (errno));
 	      return FALSE;
 	    }
-#endif /* HAVE_SYSV_TERMIO || HAVE_POSIX_TERMIOS */
 	}
 
       /* Turn on hardware flow control after turning on carrier.  We
@@ -1733,24 +1582,6 @@ fsmodem_carrier (qconn, fcarrier)
 	}
 #endif /* TIOCNCAR */
 
-#if HAVE_BSD_TTY
-#ifdef LNOMDM
-      /* IS68K Unix uses a local LNOMDM bit.  */
-      {
-	int iparam;
-
-	iparam = LNOMDM;
-	if (ioctl (q->o, TIOCLBIS, &iparam) < 0)
-	  {
-	    ulog (LOG_ERROR, "ioctl (TIOCLBIS, LNOMDM): %s",
-		  strerror (errno));
-	    return FALSE;
-	  }
-      }
-#endif /* LNOMDM */
-#endif /* HAVE_BSD_TTY */
-
-#if HAVE_SYSV_TERMIO || HAVE_POSIX_TERMIOS
       /* Put the modem into local mode (ignore carrier) to start the chat
 	 script.  */
       q->snew.c_cflag |= CLOCAL;
@@ -1784,8 +1615,6 @@ fsmodem_carrier (qconn, fcarrier)
 	q->o = onew;
       }
 #endif /* HAVE_CLOCAL_BUG */
-
-#endif /* HAVE_SYSV_TERMIO || HAVE_POSIX_TERMIOS */
     }
 
   return TRUE;
@@ -1812,10 +1641,6 @@ fsserial_hardflow (qconn, fhardflow)
     return TRUE;
 
   /* Don't do anything if we don't know what to do.  */
-#if HAVE_BSD_TTY
-#define HAVE_HARDFLOW 0
-#endif
-#if HAVE_SYSV_TERMIO || HAVE_POSIX_TERMIOS
 #if ! HAVE_TXADDCD
 #ifndef CRTSFL
 #ifndef CRTSCTS
@@ -1843,7 +1668,6 @@ fsserial_hardflow (qconn, fhardflow)
 	 actually succeeded.  */
       (void) ioctl (q->o, TXADDCD, "rts");
 #else /* ! HAVE_TXADDCD */
-#if HAVE_SYSV_TERMIO || HAVE_POSIX_TERMIOS
 #ifdef CRTSFL
       q->snew.c_cflag |= CRTSFL;
       q->snew.c_cflag &=~ (RTSFLOW | CTSFLOW);
@@ -1863,7 +1687,6 @@ fsserial_hardflow (qconn, fhardflow)
 #ifdef IRTS
       q->snew.c_iflag |= IRTS;
 #endif
-#endif /* HAVE_SYSV_TERMIO || HAVE_POSIX_TERMIOS */
       if (! fsetterminfo (q->o, &q->snew))
 	{
 	  ulog (LOG_ERROR, "Can't enable hardware flow control: %s",
@@ -1902,7 +1725,6 @@ fsserial_hardflow (qconn, fhardflow)
 	 actually succeeded.  */
       (void) ioctl (q->o, TXDELCD, "rts");
 #else /* ! HAVE_TXADDCD */
-#if HAVE_SYSV_TERMIO || HAVE_POSIX_TERMIOS
 #ifdef CRTSFL
       q->snew.c_cflag &=~ CRTSFL;
       q->snew.c_cflag &=~ (RTSFLOW | CTSFLOW);
@@ -1922,7 +1744,6 @@ fsserial_hardflow (qconn, fhardflow)
 #ifdef IRTS
       q->snew.c_iflag &=~ IRTS;
 #endif
-#endif /* HAVE_SYSV_TERMIO || HAVE_POSIX_TERMIOS */
       if (! fsetterminfo (q->o, &q->snew))
 	{
 	  ulog (LOG_ERROR, "Can't disable hardware flow control: %s",
@@ -2187,7 +2008,6 @@ fsysdep_conn_read (qconn, zbuf, pclen, cmin, ctimeout, freport)
     {
       int cgot;
 
-#if HAVE_SYSV_TERMIO || HAVE_POSIX_TERMIOS
       /* If we can tell the terminal not to return until we have a
 	 certain number of characters, do so.  */
       if (q->fterminal)
@@ -2235,7 +2055,6 @@ fsysdep_conn_read (qconn, zbuf, pclen, cmin, ctimeout, freport)
 	      cSmin = csetmin;
 	    }
 	}
-#endif /* HAVE_SYSV_TERMIO || HAVE_POSIX_TERMIOS */
 
       /* If we've received a signal, get out now.  */
       if (FGOT_QUIT_SIGNAL ())
@@ -2356,73 +2175,6 @@ fsysdep_conn_read (qconn, zbuf, pclen, cmin, ctimeout, freport)
 	  break;
 	}
 
-#if HAVE_BSD_TTY
-      /* We still want more data, so sleep long enough for the rest of
-	 it to arrive.  We don't this for System V or POSIX because
-	 setting MIN is good enough (we can't sleep longer than it
-	 takes to get MAX_INPUT characters anyhow).
-
-	 The baud rate is approximately 10 times the number of
-	 characters which will arrive in one second, so the number of
-	 milliseconds to sleep ==
-	 characters * (milliseconds / character) ==
-	 characters * (1000 * (seconds / character)) ==
-	 characters * (1000 * (1 / (baud / 10))) ==
-	 characters * (10000 / baud)
-
-	 We arbitrarily reduce the sleep amount by 10 milliseconds to
-	 attempt to account for the amount of time it takes to set up
-	 the sleep.  This is how long it takes to get half a character
-	 at 19200 baud.  We then don't bother to sleep for less than
-	 10 milliseconds.  We don't sleep if the read was interrupted.
-
-	 We use select to sleep.  It would be easy to use poll as
-	 well, but it's unlikely that any system with BSD ttys would
-	 have poll but not select.  Using select avoids hassles with
-	 the pending SIGALRM; if it hits the select will be
-	 interrupted, and otherwise the select will not affect it.  */
-
-#if ! HAVE_SELECT
- #error This code requires select; feel free to extend it
-#endif
-
-      if (q->fterminal && cmin > 1 && cgot > 0)
-	{
-	  int csleepchars;
-	  int isleep;
-
-	  /* We don't try to read all the way up to MAX_INPUT,
-	     since that might drop a character.  */
-	  if (cmin <= MAX_INPUT - 10)
-	    csleepchars = cmin;
-	  else
-	    csleepchars = MAX_INPUT - 10;
-
-	  isleep = (int) (((long) csleepchars * 10000L) / q->ibaud);
-	  isleep -= 10;
-
-	  if (isleep > 10)
-	    {
-	      struct timeval s;
-
-	      s.tv_sec = isleep / 1000;
-	      s.tv_usec = (isleep % 1000) * 1000;
-
-	      /* Some versions of select take a pointer to an int,
-		 while some take a pointer to an fd_set.  I just cast
-		 the arguments to a generic pointer, and assume that
-		 any machine which distinguishes int * from fd_set *
-		 (I would be amazed if there are any such machines)
-		 have an appropriate prototype somewhere or other.  */
-	      (void) select (0, (pointer) NULL, (pointer) NULL,
-			     (pointer) NULL, &s);
-
-	      /* Here either the select finished sleeping or we got a
-		 SIGALRM.  If the latter occurred, fSalarm was set to
-		 TRUE; it will be checked at the top of the loop.  */
-	    }
-	}
-#endif /* HAVE_BSD_TTY */
     }
 
   /* Turn off the pending SIGALRM and return.  */
@@ -2994,19 +2746,7 @@ fsserial_break (qconn)
 
   q = (struct ssysdep_conn *) qconn->psysdep;
 
-#if HAVE_BSD_TTY
-  (void) ioctl (q->o, TIOCSBRK, 0);
-  sleep (2);
-  (void) ioctl (q->o, TIOCCBRK, 0);
-  return TRUE;
-#endif /* HAVE_BSD_TTY */
-#if HAVE_SYSV_TERMIO
-  (void) ioctl (q->o, TCSBRK, 0);
-  return TRUE;
-#endif /* HAVE_SYSV_TERMIO */
-#if HAVE_POSIX_TERMIOS
   return tcsendbreak (q->o, 0) == 0;
-#endif /* HAVE_POSIX_TERMIOS */
 }
 
 /* Send a break character to a stdin port.  */
@@ -3046,55 +2786,6 @@ fsserial_set (qconn, tparity, tstrip, txonxoff)
 
   /* Set the parity for output characters.  */
 
-#if HAVE_BSD_TTY
-
-  /* This will also cause parity detection on input characters.  */
-
-  fdo = FALSE;
-  switch (tparity)
-    {
-    case PARITYSETTING_DEFAULT:
-      break;
-    case PARITYSETTING_NONE:
-#if HAVE_PARITY_BUG
-      /* The Sony NEWS mishandles this for some reason.  */
-      iset = 0;
-      iclear = ANYP;
-#else
-      iset = ANYP;
-      iclear = 0;
-#endif
-      fdo = TRUE;
-      break;
-    case PARITYSETTING_EVEN:
-      iset = EVENP;
-      iclear = ODDP;
-      fdo = TRUE;
-      break;
-    case PARITYSETTING_ODD:
-      iset = ODDP;
-      iclear = EVENP;
-      fdo = TRUE;
-      break;
-    case PARITYSETTING_MARK:
-    case PARITYSETTING_SPACE:
-      /* Not supported.  */
-      break;
-    }
-
-  if (fdo)
-    {
-      if ((q->snew.stty.sg_flags & iset) != iset
-	  || (q->snew.stty.sg_flags & iclear) != 0)
-	{
-	  q->snew.stty.sg_flags |= iset;
-	  q->snew.stty.sg_flags &=~ iclear;
-	  fchanged = TRUE;
-	}
-    }
-
-#else /* ! HAVE_BSD_TTY */
-
   fdo = FALSE;
   switch (tparity)
     {
@@ -3132,31 +2823,7 @@ fsserial_set (qconn, tparity, tstrip, txonxoff)
 	}
     }
 
-#endif /* ! HAVE_BSD_TTY */
-
   /* Set whether input characters are stripped to seven bits.  */
-
-#if HAVE_BSD_TTY
-
-#ifdef LPASS8
-  {
-    int i;
-
-    i = LPASS8;
-    if (tstrip == STRIPSETTING_EIGHTBITS)
-      {
-	i = LPASS8;
-	(void) ioctl (q->o, TIOCLBIS, &i);
-      }
-    else if (tstrip == STRIPSETTING_SEVENBITS)
-      {
-	i = LPASS8;
-	(void) ioctl (q->o, TIOCLBIC, &i);
-      }
-  }
-#endif
-
-#else /* ! HAVE_BSD_TTY */      
 
   fdo = FALSE;
   switch (tstrip)
@@ -3186,41 +2853,7 @@ fsserial_set (qconn, tparity, tstrip, txonxoff)
 	}
     }
 
-#endif /* ! HAVE_BSD_TTY */
-
   /* Set XON/XOFF handshaking.  */
-
-#if HAVE_BSD_TTY
-
-  fdo = FALSE;
-  switch (txonxoff)
-    {
-    case XONXOFF_DEFAULT:
-      break;
-    case XONXOFF_OFF:
-      iset = RAW;
-      iclear = TANDEM | CBREAK;
-      fdo = TRUE;
-      break;
-    case XONXOFF_ON:
-      iset = CBREAK | TANDEM;
-      iclear = RAW;
-      fdo = TRUE;
-      break;
-    }
-
-  if (fdo)
-    {
-      if ((q->snew.stty.sg_flags & iset) != iset
-	  || (q->snew.stty.sg_flags & iclear) != 0)
-	{
-	  q->snew.stty.sg_flags |= iset;
-	  q->snew.stty.sg_flags &=~ iclear;
-	  fchanged = TRUE;
-	}
-    }
-
-#else /* ! HAVE_BSD_TTY */
 
   fdo = FALSE;
   switch (txonxoff)
@@ -3234,7 +2867,6 @@ fsserial_set (qconn, tparity, tstrip, txonxoff)
       break;
     case XONXOFF_ON:
 #ifdef CRTSCTS
-#if HAVE_POSIX_TERMIOS
       /* This is system dependent, but I haven't figured out a good
 	 way around it yet.  If we are doing hardware flow control, we
 	 don't send XON/XOFF characters but we do recognize them.  */
@@ -3245,7 +2877,6 @@ fsserial_set (qconn, tparity, tstrip, txonxoff)
 	  fdo = TRUE;
 	  break;
 	}
-#endif /* HAVE_POSIX_TERMIOS */
 #endif /* defined (CRTSCTS) */
 #ifdef CRTSFL
       if ((q->snew.c_cflag & CRTSFL) != 0)
@@ -3280,8 +2911,6 @@ fsserial_set (qconn, tparity, tstrip, txonxoff)
 	}
     }
 
-#endif /* ! HAVE_BSD_TTY */
-
   if (fchanged)
     {
       if (! fsetterminfodrain (q->o, &q->snew))
@@ -3291,47 +2920,6 @@ fsserial_set (qconn, tparity, tstrip, txonxoff)
 	  return FALSE;
 	}
     }
-
-#if HAVE_BSD_TTY
-  if (txonxoff == XONXOFF_ON
-      && (q->snew.stty.sg_flags & ANYP) == ANYP)
-    {
-      int i;
-
-      /* At least on Ultrix, we seem to have to set LLITOUT and
-	 LPASS8.  This shouldn't foul things up anywhere else.  As far
-	 as I can tell, this has to be done after setting the terminal
-	 into cbreak mode, not before.  */
-#ifndef LLITOUT
-#define LLITOUT 0
-#endif
-#ifndef LPASS8
-#define LPASS8 0
-#endif
-#ifndef LAUTOFLOW
-#define LAUTOFLOW 0
-#endif
-      i = LLITOUT | LPASS8 | LAUTOFLOW;
-      (void) ioctl (q->o, TIOCLBIS, &i);
-
-#if HAVE_STRIP_BUG
-      /* Ultrix 4.0 has a peculiar problem: setting CBREAK always
-	 causes input characters to be stripped.  I hope this does not
-	 apply to other BSD systems.  It is possible to work around
-	 this by using the termio call.  I wish this sort of stuff was
-	 not necessary!!!  */
-      {
-	struct termio s;
-
-	if (ioctl (q->o, TCGETA, &s) >= 0)
-	  {
-	    s.c_iflag &=~ ISTRIP;
-	    (void) ioctl (q->o, TCSETA, &s);
-	  }
-      }
-#endif /* HAVE_STRIP_BUG */
-    }
-#endif /* HAVE_BSD_TTY */
 
   return TRUE;
 }
