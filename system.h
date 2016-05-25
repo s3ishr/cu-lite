@@ -220,14 +220,6 @@ extern boolean fsysdep_file_exists P((const char *zfile));
 extern boolean fsysdep_run P((boolean ffork, const char *zprogram,
                               const char *zarg1, const char *zarg2));
 
-/* Send a mail message.  This function will be passed an array of
-   strings.  All necessary newlines are already included; the strings
-   should simply be concatenated together to form the mail message.
-   It should return FALSE on error, although the return value is often
-   ignored.  */
-extern boolean fsysdep_mail P((const char *zto, const char *zsubject,
-                               int cstrs, const char **paz));
-
 /* Get the time in seconds since some epoch.  The actual epoch is
    unimportant, so long as the time values are consistent across
    program executions and the value is never negative.  If the

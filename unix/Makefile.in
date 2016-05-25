@@ -116,20 +116,19 @@ am_libunix_a_OBJECTS = access.$(OBJEXT) addbas.$(OBJEXT) \
 	fsusg.$(OBJEXT) indir.$(OBJEXT) init.$(OBJEXT) isdir.$(OBJEXT) \
 	isfork.$(OBJEXT) iswait.$(OBJEXT) jobid.$(OBJEXT) \
 	lcksys.$(OBJEXT) link.$(OBJEXT) locfil.$(OBJEXT) \
-	lock.$(OBJEXT) loctim.$(OBJEXT) mail.$(OBJEXT) \
-	mkdirs.$(OBJEXT) mode.$(OBJEXT) move.$(OBJEXT) \
-	opensr.$(OBJEXT) pause.$(OBJEXT) picksb.$(OBJEXT) \
-	pipe.$(OBJEXT) portnm.$(OBJEXT) priv.$(OBJEXT) \
-	proctm.$(OBJEXT) recep.$(OBJEXT) run.$(OBJEXT) seq.$(OBJEXT) \
-	serial.$(OBJEXT) signal.$(OBJEXT) sindir.$(OBJEXT) \
-	size.$(OBJEXT) sleep.$(OBJEXT) spawn.$(OBJEXT) \
-	splcmd.$(OBJEXT) splnam.$(OBJEXT) spool.$(OBJEXT) \
-	srmdir.$(OBJEXT) statsb.$(OBJEXT) status.$(OBJEXT) \
-	sync.$(OBJEXT) tcp.$(OBJEXT) time.$(OBJEXT) tli.$(OBJEXT) \
-	tmpfil.$(OBJEXT) trunc.$(OBJEXT) uacces.$(OBJEXT) \
-	ufopen.$(OBJEXT) uid.$(OBJEXT) ultspl.$(OBJEXT) \
-	umode.$(OBJEXT) unknwn.$(OBJEXT) walk.$(OBJEXT) \
-	wldcrd.$(OBJEXT) work.$(OBJEXT)
+	lock.$(OBJEXT) loctim.$(OBJEXT) mkdirs.$(OBJEXT) \
+	mode.$(OBJEXT) move.$(OBJEXT) opensr.$(OBJEXT) pause.$(OBJEXT) \
+	picksb.$(OBJEXT) pipe.$(OBJEXT) portnm.$(OBJEXT) \
+	priv.$(OBJEXT) proctm.$(OBJEXT) recep.$(OBJEXT) run.$(OBJEXT) \
+	seq.$(OBJEXT) serial.$(OBJEXT) signal.$(OBJEXT) \
+	sindir.$(OBJEXT) size.$(OBJEXT) sleep.$(OBJEXT) \
+	spawn.$(OBJEXT) splcmd.$(OBJEXT) splnam.$(OBJEXT) \
+	spool.$(OBJEXT) srmdir.$(OBJEXT) statsb.$(OBJEXT) \
+	status.$(OBJEXT) sync.$(OBJEXT) tcp.$(OBJEXT) time.$(OBJEXT) \
+	tli.$(OBJEXT) tmpfil.$(OBJEXT) trunc.$(OBJEXT) \
+	uacces.$(OBJEXT) ufopen.$(OBJEXT) uid.$(OBJEXT) \
+	ultspl.$(OBJEXT) umode.$(OBJEXT) unknwn.$(OBJEXT) \
+	walk.$(OBJEXT) wldcrd.$(OBJEXT) work.$(OBJEXT)
 libunix_a_OBJECTS = $(am_libunix_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -290,7 +289,7 @@ libunix_a_SOURCES = access.c addbas.c app3.c app4.c basnam.c bytfre.c \
 	corrup.c chmod.c cohtty.c cusub.c cwd.c detach.c efopen.c epopen.c \
 	exists.c failed.c filnam.c fsusg.c indir.c init.c isdir.c \
 	isfork.c iswait.c jobid.c lcksys.c link.c locfil.c lock.c \
-	loctim.c mail.c mkdirs.c mode.c move.c opensr.c pause.c \
+	loctim.c mkdirs.c mode.c move.c opensr.c pause.c \
 	picksb.c pipe.c portnm.c priv.c proctm.c recep.c run.c seq.c \
 	serial.c signal.c sindir.c size.c sleep.c spawn.c splcmd.c \
 	splnam.c spool.c srmdir.c statsb.c status.c sync.c tcp.c \
@@ -386,7 +385,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/locfil.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lock.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loctim.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mail.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mkdir.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mkdirs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mode.Po@am__quote@

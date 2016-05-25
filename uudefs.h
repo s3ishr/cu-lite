@@ -251,13 +251,6 @@ extern char *zremove_local_sys P((struct uuconf_system *qlocalsys,
    returns the largest size that may be transferred at some time.  */
 extern long cmax_size_ever P((const struct uuconf_timespan *qtimesize));
 
-/* Send mail about a file transfer.  */
-extern boolean fmail_transfer P((boolean fok, const char *zuser,
-                                 const char *zmail, const char *zwhy,
-                                 const char *zfrom, const char *zfromsys,
-                                 const char *zto, const char *ztosys,
-                                 const char *zsaved));
-
 /* See whether a file is in one of a list of directories.  The zpubdir
    argument is used to pass the directory names to zsysdep_local_file.
    If fcheck is FALSE, this does not check accessibility.  Otherwise,
