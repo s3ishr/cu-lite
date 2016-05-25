@@ -1654,7 +1654,6 @@ fsserial_hardflow (qconn, fhardflow)
 #endif
 #endif
 #endif
-#endif
 
 #ifndef HAVE_HARDFLOW
 #define HAVE_HARDFLOW 1
