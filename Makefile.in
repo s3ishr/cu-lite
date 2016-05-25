@@ -418,7 +418,7 @@ LDADD = unix/libunix.a uuconf/libuuconf.a lib/libuucp.a
 UUHEADERS = uucp.h uudefs.h uuconf.h policy.h system.h sysdep.h getopt.h
 cu_SOURCES = cu.h cu.c prot.c log.c chat.c conn.c copy.c $(UUHEADERS)
 uuconv_CFLAGS = -I$(srcdir)/uuconf $(AM_CFLAGS)
-EXTRA_DIST = cu.1 contrib sample
+EXTRA_DIST = cu.1 contrib
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
