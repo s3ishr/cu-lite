@@ -35,7 +35,7 @@ dist-hook:
 	-rm -rf $(distdir)/contrib/CVS $(distdir)/sample/CVS
 
 install-exec-hook:
-	for f in uucp cu; do \
+	for f in cu; do \
 	  chown $(OWNER) $(DESTDIR)$(bindir)/$${f}; \
 	  chmod 4555 $(DESTDIR)$(bindir)/$${f}; \
 	done
