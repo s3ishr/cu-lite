@@ -41,20 +41,9 @@ uuconf_login_localname (pglobal, zlogin, pzname)
   struct sglobal *qglobal = (struct sglobal *) pglobal;
   int iret;
 
-#if HAVE_TAYLOR_CONFIG
   iret = uuconf_taylor_login_localname (pglobal, zlogin, pzname);
   if (iret != UUCONF_NOT_FOUND)
     return iret;
-#endif
-
-#if HAVE_HDB_CONFIG
-  if (qglobal->qprocess->fhdb)
-    {
-      iret = uuconf_hdb_login_localname (pglobal, zlogin, pzname);
-      if (iret != UUCONF_NOT_FOUND)
-	return iret;
-    }
-#endif
 
   if (qglobal->qprocess->zlocalname != NULL)
     {

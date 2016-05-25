@@ -849,9 +849,7 @@ ucuhelp ()
   printf (" -n,--prompt: Prompt for phone number\n");
   printf (" -d: Set maximum debugging level\n");
   printf (" -x,--debug debug: Set debugging type\n");
-#if HAVE_TAYLOR_CONFIG
   printf (" -I,--config file: Set configuration file to use\n");
-#endif /* HAVE_TAYLOR_CONFIG */
   printf (" -v,--version: Print version and exit\n");
   printf (" --help: Print help and exit\n");
   printf ("Report bugs to taylor-uucp@gnu.org\n");

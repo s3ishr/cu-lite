@@ -47,29 +47,9 @@ uuconf_system_names (pglobal, ppzsystems, falias)
   pzv2 = NULL;
   pzhdb = NULL;
 
-#if HAVE_TAYLOR_CONFIG
   iret = uuconf_taylor_system_names (pglobal, &pztaylor, falias);
   if (iret != UUCONF_SUCCESS)
     return iret;
-#endif
-
-#if HAVE_V2_CONFIG
-  if (qglobal->qprocess->fv2)
-    {
-      iret = uuconf_v2_system_names (pglobal, &pzv2, falias);
-      if (iret != UUCONF_SUCCESS)
-	return iret;
-    }
-#endif
-
-#if HAVE_HDB_CONFIG
-  if (qglobal->qprocess->fhdb)
-    {
-      iret = uuconf_hdb_system_names (pglobal, &pzhdb, falias);
-      if (iret != UUCONF_SUCCESS)
-	return iret;
-    }
-#endif
 
   if (pzv2 == NULL && pzhdb == NULL)
     *ppzsystems = pztaylor;

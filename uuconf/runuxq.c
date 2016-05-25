@@ -41,7 +41,6 @@ uuconf_runuuxqt (pglobal, pirunuuxqt)
      pointer pglobal;
      int *pirunuuxqt;
 {
-#if HAVE_TAYLOR_CONFIG
   {
     struct sglobal *qglobal = (struct sglobal *) pglobal;
     const char *zrun;
@@ -64,13 +63,5 @@ uuconf_runuuxqt (pglobal, pirunuuxqt)
 	  *pirunuuxqt = UUCONF_RUNUUXQT_ONCE;
       }
   }
-#else /* ! HAVE_TAYLOR_CONFIG */
-#if HAVE_HDB_CONFIG
-  *pirunuuxqt = UUCONF_RUNUUXQT_PERCALL;
-#else /* ! HAVE_HDB_CONFIG */
-  *pirunuuxqt = 10;
-#endif /* ! HAVE_HDB_CONFIG */
-#endif /* ! HAVE_TAYLOR_CONFIG */
-
   return UUCONF_SUCCESS;
 }

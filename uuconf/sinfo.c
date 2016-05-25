@@ -44,65 +44,11 @@ uuconf_system_info (pglobal, zsystem, qsys)
 
   fgot = FALSE;
 
-#if HAVE_TAYLOR_CONFIG
   iret = _uuconf_itaylor_system_internal (qglobal, zsystem, qsys);
   if (iret == UUCONF_SUCCESS)
     fgot = TRUE;
   else if (iret != UUCONF_NOT_FOUND)
     return iret;
-#endif
-
-#if HAVE_V2_CONFIG
-  if (qglobal->qprocess->fv2)
-    {
-      struct uuconf_system *q;
-      struct uuconf_system sv2;
-
-      if (fgot)
-	q = &sv2;
-      else
-	q = qsys;
-      iret = _uuconf_iv2_system_internal (qglobal, zsystem, q);
-      if (iret == UUCONF_SUCCESS)
-	{
-	  if (fgot)
-	    {
-	      iret = _uuconf_isystem_default (qglobal, qsys, &sv2, TRUE);
-	      if (iret != UUCONF_SUCCESS)
-		return iret;
-	    }
-	  fgot = TRUE;
-	}
-      else if (iret != UUCONF_NOT_FOUND)
-	return iret;
-    }
-#endif
-
-#if HAVE_HDB_CONFIG
-  if (qglobal->qprocess->fhdb)
-    {
-      struct uuconf_system *q;
-      struct uuconf_system shdb;
-
-      if (fgot)
-	q = &shdb;
-      else
-	q = qsys;
-      iret = _uuconf_ihdb_system_internal (qglobal, zsystem, q);
-      if (iret == UUCONF_SUCCESS)
-	{
-	  if (fgot)
-	    {
-	      iret = _uuconf_isystem_default (qglobal, qsys, &shdb, TRUE);
-	      if (iret != UUCONF_SUCCESS)
-		return iret;
-	    }
-	  fgot = TRUE;
-	}
-      else if (iret != UUCONF_NOT_FOUND)
-	return iret;
-    }
-#endif
 
   if (! fgot)
     return UUCONF_NOT_FOUND;

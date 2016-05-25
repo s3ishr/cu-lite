@@ -44,20 +44,9 @@ uuconf_dialer_names (pglobal, ppzdialers)
   pztaylor = NULL;
   pzhdb = NULL;
 
-#if HAVE_TAYLOR_CONFIG
   iret = uuconf_taylor_dialer_names (pglobal, &pztaylor);
   if (iret != UUCONF_SUCCESS)
     return iret;
-#endif
-
-#if HAVE_HDB_CONFIG
-  if (qglobal->qprocess->fhdb)
-    {
-      iret = uuconf_hdb_dialer_names (pglobal, &pzhdb);
-      if (iret != UUCONF_SUCCESS)
-	return iret;
-    }
-#endif
 
   if (pzhdb == NULL)
     *ppzdialers = pztaylor;

@@ -45,29 +45,9 @@ uuconf_init (ppglobal, zprogram, zname)
 
   *pqglob = NULL;
 
-#if HAVE_TAYLOR_CONFIG
   iret = uuconf_taylor_init (ppglobal, zprogram, zname);
   if (iret != UUCONF_SUCCESS)
     return iret;
-#endif
-
-#if HAVE_V2_CONFIG
-  if (*pqglob == NULL || (*pqglob)->qprocess->fv2)
-    {
-      iret = uuconf_v2_init (ppglobal);
-      if (iret != UUCONF_SUCCESS)
-	return iret;
-    }
-#endif
-
-#if HAVE_HDB_CONFIG
-  if (*pqglob == NULL || (*pqglob)->qprocess->fhdb)
-    {
-      iret = uuconf_hdb_init (ppglobal, zprogram);
-      if (iret != UUCONF_SUCCESS)
-	return iret;
-    }
-#endif
 
   return iret;
 }

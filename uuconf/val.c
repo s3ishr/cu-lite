@@ -37,9 +37,5 @@ uuconf_validate (pglobal, qsys, zlogin)
      const struct uuconf_system *qsys;
      const char *zlogin;
 {
-#if HAVE_TAYLOR_CONFIG
   return uuconf_taylor_validate (pglobal, qsys, zlogin);
-#else
-  return UUCONF_SUCCESS;
-#endif
 }

@@ -40,53 +40,5 @@ uuconf_callout (pglobal, qsys, pzlog, pzpass)
      char **pzlog;
      char **pzpass;
 {
-#if HAVE_TAYLOR_CONFIG
-
   return uuconf_taylor_callout (pglobal, qsys, pzlog, pzpass);
-
-#else /* ! HAVE_TAYLOR_CONFIG */
-
-  struct sglobal *qglobal = (struct sglobal *) pglobal;
-
-  *pzlog = NULL;
-  *pzpass = NULL;
-
-  if (qsys->uuconf_zcall_login == NULL
-      && qsys->uuconf_zcall_password == NULL)
-    return UUCONF_NOT_FOUND;
-
-  if ((qsys->uuconf_zcall_login != NULL
-       && strcmp (qsys->uuconf_zcall_login, "*") == 0)
-      || (qsys->uuconf_zcall_password != NULL
-	  && strcmp (qsys->uuconf_zcall_password, "*") == 0))
-    return UUCONF_NOT_FOUND;
-      
-  if (qsys->uuconf_zcall_login != NULL)
-    {
-      *pzlog = strdup (qsys->uuconf_zcall_login);
-      if (*pzlog == NULL)
-	{
-	  qglobal->ierrno = errno;
-	  return UUCONF_MALLOC_FAILED | UUCONF_ERROR_ERRNO;
-	}
-    }
-
-  if (qsys->uuconf_zcall_password != NULL)
-    {
-      *pzpass = strdup (qsys->uuconf_zcall_password);
-      if (*pzpass == NULL)
-	{
-	  qglobal->ierrno = errno;
-	  if (*pzlog != NULL)
-	    {
-	      free ((pointer) *pzlog);
-	      *pzlog = NULL;
-	    }
-	  return UUCONF_MALLOC_FAILED | UUCONF_ERROR_ERRNO;
-	}
-    }
-
-  return UUCONF_SUCCESS;
-
-#endif /* ! HAVE_TAYLOR_CONFIG */
 }

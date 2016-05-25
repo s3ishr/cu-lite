@@ -29,7 +29,7 @@ const char _uuconf_cnfnms_rcsid[] = "$Id: cnfnms.c,v 1.2 2002/03/05 19:10:42 ian
 #endif
 
 #include <errno.h>
-
+
 int
 uuconf_config_files (pglobal, qnames)
      pointer pglobal;
@@ -64,27 +64,6 @@ uuconf_config_files (pglobal, qnames)
     (const char * const *) qglobal->qprocess->pzhdb_dialers;
 
   qnames->uuconf_zhdb_permissions = NULL;
-#if HAVE_HDB_CONFIG
-  if (qglobal->qprocess->fhdb)
-    {    
-      /* FIXME: There is a memory leak here.  */
-      qnames->uuconf_zhdb_permissions =
-	(char *) uuconf_malloc(qglobal->pblock,
-			       (sizeof OLDCONFIGLIB
-				+ sizeof HDB_PERMISSIONS - 1));
-      if (qnames->uuconf_zhdb_permissions == NULL)
-	{
-	  qglobal->ierrno = errno;
-	  return UUCONF_MALLOC_FAILED | UUCONF_ERROR_ERRNO;
-	}
-      memcpy((pointer) qnames->uuconf_zhdb_permissions, (pointer) OLDCONFIGLIB,
-	     sizeof OLDCONFIGLIB - 1);
-      memcpy((pointer) (qnames->uuconf_zhdb_permissions
-			+ sizeof OLDCONFIGLIB
-			- 1),
-	     (pointer) HDB_PERMISSIONS, sizeof HDB_PERMISSIONS);
-    }
-#endif
 
   return UUCONF_SUCCESS;
 }
