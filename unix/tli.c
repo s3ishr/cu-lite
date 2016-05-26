@@ -132,7 +132,6 @@ static const struct sconncmds stlicmds =
   NULL, /* pfbreak */
   NULL, /* pfset */
   NULL, /* pfcarrier */
-  fsysdep_conn_chat,
   NULL /* pibaud */
 };
 

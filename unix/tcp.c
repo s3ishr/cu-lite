@@ -105,7 +105,6 @@ static const struct sconncmds stcpcmds =
   NULL, /* pfbreak */
   NULL, /* pfset */
   NULL, /* pfcarrier */
-  fsysdep_conn_chat,
   NULL /* pibaud */
 };
 

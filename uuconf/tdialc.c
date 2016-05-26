@@ -27,9 +27,7 @@
 #if USE_RCS_ID
 const char _uuconf_tdialc_rcsid[] = "$Id: tdialc.c,v 1.9 2002/03/05 19:10:43 ian Rel $";
 #endif
-
-static int idchat P((pointer pglobal, int argc, char **argv, pointer pvar,
-		     pointer pinfo));
+
 static int iddtr_toggle P((pointer pglobal, int argc, char **argv,
 			   pointer pvar, pointer pinfo));
 static int idcomplete P((pointer pglobal, int argc, char **argv,
@@ -43,8 +41,6 @@ static int idcunknown P((pointer pglobal, int argc, char **argv,
    handled specially.  */
 static const struct cmdtab_offset asDialer_cmds[] =
 {
-  { "chat", UUCONF_CMDTABTYPE_PREFIX | 0,
-      offsetof (struct uuconf_dialer, uuconf_schat), idchat },
   { "dialtone", UUCONF_CMDTABTYPE_STRING,
       offsetof (struct uuconf_dialer, uuconf_zdialtone), NULL },
   { "pause", UUCONF_CMDTABTYPE_STRING,
@@ -56,12 +52,8 @@ static const struct cmdtab_offset asDialer_cmds[] =
   { "dtr-toggle", UUCONF_CMDTABTYPE_FN | 0, (size_t) -1, iddtr_toggle },
   { "complete", UUCONF_CMDTABTYPE_FN | 2,
       offsetof (struct uuconf_dialer, uuconf_scomplete), idcomplete },
-  { "complete-chat", UUCONF_CMDTABTYPE_PREFIX,
-      offsetof (struct uuconf_dialer, uuconf_scomplete), idchat },
   { "abort", UUCONF_CMDTABTYPE_FN | 2,
       offsetof (struct uuconf_dialer, uuconf_sabort), idcomplete },
-  { "abort-chat", UUCONF_CMDTABTYPE_PREFIX,
-      offsetof (struct uuconf_dialer, uuconf_sabort), idchat },
   { "protocol-parameter", UUCONF_CMDTABTYPE_FN | 0,
       offsetof (struct uuconf_dialer, uuconf_qproto_params), idproto_param },
   { "seven-bit", UUCONF_CMDTABTYPE_FN | 2,
@@ -101,24 +93,6 @@ _uuconf_idialer_cmd (qglobal, argc, argv, qdialer)
 			  qdialer->uuconf_palloc);
 
   return iret &~ UUCONF_CMDTABRET_EXIT;
-}
-
-/* Reroute a chat script command.  */
-
-static int
-idchat (pglobal, argc, argv, pvar, pinfo)
-     pointer pglobal;
-     int argc;
-     char **argv;
-     pointer pvar;
-     pointer pinfo;
-{
-  struct sglobal *qglobal = (struct sglobal *) pglobal;
-  struct uuconf_chat *qchat = (struct uuconf_chat *) pvar;
-  struct uuconf_dialer *qdialer = (struct uuconf_dialer *) pinfo;
-
-  return _uuconf_ichat_cmd (qglobal, argc, argv, qchat,
-			    qdialer->uuconf_palloc);
 }
 
 /* Handle the "dtr-toggle" command, which may take two arguments.  */
@@ -169,12 +143,10 @@ idcomplete (pglobal, argc, argv, pvar, pinfo)
   struct uuconf_dialer *qdialer = (struct uuconf_dialer *) pinfo;
   char *azargs[3];
 
-  azargs[0] = (char *) "complete-chat";
   azargs[1] = (char *) "\"\"";
   azargs[2] = (char *) argv[1];
 
-  return _uuconf_ichat_cmd (qglobal, 3, azargs, qchat,
-			    qdialer->uuconf_palloc);
+  return UUCONF_CMDTABRET_EXIT;
 }
 
 /* Handle the "protocol-parameter" command.  */

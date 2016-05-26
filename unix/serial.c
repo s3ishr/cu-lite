@@ -240,7 +240,6 @@ static boolean fsmodem_carrier P((struct sconnection *qconn,
 				  boolean fcarrier));
 static boolean fsserial_hardflow P((struct sconnection *qconn,
 				    boolean fhardflow));
-static boolean fsrun_chat P((int oread, int owrite, char **pzprog));
 static long isserial_baud P((struct sconnection *qconn));
 
 /* The command table for standard input ports.  */
@@ -259,7 +258,6 @@ static const struct sconncmds sstdincmds =
   fsstdin_break,
   fsstdin_set,
   NULL, /* pfcarrier */
-  fsdouble_chat,
   isserial_baud
 };
 
@@ -279,7 +277,6 @@ static const struct sconncmds smodemcmds =
   fsserial_break,
   fsserial_set,
   fsmodem_carrier,
-  fsysdep_conn_chat,
   isserial_baud
 };
 
@@ -299,7 +296,6 @@ static const struct sconncmds sdirectcmds =
   fsserial_break,
   fsserial_set,
   NULL, /* pfcarrier */
-  fsysdep_conn_chat,
   isserial_baud
 };
 
@@ -1324,8 +1320,7 @@ fsmodem_close (qconn, puuconf, qdialer, fsuccess)
     }
 
   if (qchat != NULL
-      && (qchat->uuconf_pzprogram != NULL
-	  || qchat->uuconf_pzchat != NULL))
+      && (qchat->uuconf_pzprogram != NULL))
     {
       boolean fsighup_ignored;
       HELD_SIG_MASK smask;
@@ -2932,102 +2927,7 @@ fsstdin_set (qconn, tparity, tstrip, txonxoff)
   qsysdep->o = qsysdep->ord;
   return fsserial_set (qconn, tparity, tstrip, txonxoff);
 }
-
-/* Run a chat program.  */
 
-static boolean
-fsrun_chat (oread, owrite, pzprog)
-     int oread;
-     int owrite;
-     char **pzprog;
-{
-  int aidescs[3];
-  FILE *e;
-  pid_t ipid;
-  char *z;
-  size_t c;
-
-  aidescs[0] = oread;
-  aidescs[1] = owrite;
-  aidescs[2] = SPAWN_READ_PIPE;
-
-  /* Pass fkeepuid, fkeepenv and fshell as TRUE.  This puts the
-     responsibility of maintaing security on the chat program.  */
-  ipid = ixsspawn ((const char **) pzprog, aidescs, TRUE, TRUE,
-		   (const char *) NULL, FALSE, TRUE, (const char *) NULL,
-		   (const char *) NULL, (const char *) NULL);
-  if (ipid < 0)
-    {
-      ulog (LOG_ERROR, "ixsspawn (%s): %s", pzprog[0], strerror (errno));
-      return FALSE;
-    }
-
-  e = fdopen (aidescs[2], (char *) "r");
-  if (e == NULL)
-    {
-      ulog (LOG_ERROR, "fdopen: %s", strerror (errno));
-      (void) close (aidescs[2]);
-      (void) kill (ipid, SIGKILL);
-      (void) ixswait ((unsigned long) ipid, (const char *) NULL);
-      return FALSE;
-    }
-
-  /* The FILE e now is attached to stderr of the program.  Forward
-     every line the program outputs to the log file.  */
-  z = NULL;
-  c = 0;
-  while (getline (&z, &c, e) > 0)
-    {
-      size_t clen;
-
-      clen = strlen (z);
-      if (z[clen - 1] == '\n')
-	z[clen - 1] = '\0';
-      if (*z != '\0')
-	ulog (LOG_NORMAL, "chat: %s", z);
-    }
-
-  xfree ((pointer) z);
-  (void) fclose (e);
-
-  return ixswait ((unsigned long) ipid, "Chat program") == 0;
-}
-
-/* Run a chat program on a port using separate read/write file
-   descriptors.  */
-
-boolean
-fsdouble_chat (qconn, pzprog)
-     struct sconnection *qconn;
-     char **pzprog;
-{
-  struct ssysdep_conn *qsysdep;
-  boolean fret;
-
-  qsysdep = (struct ssysdep_conn *) qconn->psysdep;
-  fret = fsrun_chat (qsysdep->ord, qsysdep->owr, pzprog);
-  if (qsysdep->fterminal)
-    (void) fgetterminfo (qsysdep->ord, &qsysdep->snew);
-  return fret;
-}
-
-/* Run a chat program on any general type of connection.  */
-
-boolean
-fsysdep_conn_chat (qconn, pzprog)
-     struct sconnection *qconn;
-     char **pzprog;
-{
-  struct ssysdep_conn *qsysdep;
-  boolean fret;
-
-  qsysdep = (struct ssysdep_conn *) qconn->psysdep;
-  fret = fsrun_chat (qsysdep->o, qsysdep->o, pzprog);
-  if (qsysdep->fterminal)
-    (void) fgetterminfo (qsysdep->o, &qsysdep->snew);
-  return fret;
-}
-
 /* Return baud rate of a serial port.  */
 
 static long

@@ -339,15 +339,6 @@ _uuconf_ihdb_system_internal (qglobal, zsystem, qsys)
 	  if (ctoks < 6)
 	    continue;
 
-	  /* Get the chat script.  We just hand this off to the chat
-	     script processor, so that it will parse subsend and
-	     subexpect strings correctly.  */
-	  pzsplit[4] = (char *) "chat";
-	  iret = _uuconf_ichat_cmd (qglobal, ctoks - 4, pzsplit + 4,
-				    &qset->uuconf_schat, pblock);
-	  iret &=~ UUCONF_CMDTABRET_KEEP;
-	  if (iret != UUCONF_SUCCESS)
-	    break;
 	}
   
       (void) fclose (e);

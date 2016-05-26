@@ -144,21 +144,6 @@ uuconf_hdb_dialer_info (pglobal, zname, qdialer)
 		    }
 		}
 
-	      /* Any remaining fields form a chat script.  */
-	      if (ctoks > 2)
-		{
-		  pzsplit[1] = (char *) "chat";
-		  iret = _uuconf_ichat_cmd (qglobal, ctoks - 1,
-					    pzsplit + 1,
-					    &qdialer->uuconf_schat,
-					    pblock);
-		  iret &=~ UUCONF_CMDTABRET_KEEP;
-		  if (iret != UUCONF_SUCCESS)
-		    {
-		      uuconf_free_block (pblock);
-		      break;
-		    }
-		}
 	    }
 
 	  iret = UUCONF_SUCCESS;
