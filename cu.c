@@ -219,7 +219,6 @@ static const struct option asCulongopts[] =
   { "mapcr", no_argument, NULL, 't' },
   { "nostop", no_argument, NULL, 3 },
   { "system", required_argument, NULL, 'z' },
-  { "config", required_argument, NULL, 'I' },
   { "debug", required_argument, NULL, 'x' },
   { "version", no_argument, NULL, 'v' },
   { "help", no_argument, NULL, 1 },
@@ -247,8 +246,6 @@ main (argc, argv)
   const char *zsystem = NULL;
   /* --nostop: turn off XON/XOFF.  */
   enum txonxoffsetting txonxoff = XONXOFF_ON;
-  /* -I: configuration file name.  */
-  const char *zconfig = NULL;
   int iopt;
   pointer puuconf;
   int iuuconf;
@@ -284,7 +281,7 @@ main (argc, argv)
         }
     }
 
-  while ((iopt = getopt_long (argc, argv, "a:c:deE:hnI:l:op:s:tvx:z:",
+  while ((iopt = getopt_long (argc, argv, "a:deE:hl:op:s:tvx:z:",
                               asCulongopts, (int *) NULL)) != EOF)
     {
       switch (iopt)
@@ -340,12 +337,6 @@ main (argc, argv)
         case 'z':
           /* System name.  */
           zsystem = optarg;
-          break;
-
-        case 'I':
-          /* Configuration file name.  */
-          if (fsysdep_other_config (optarg))
-            zconfig = optarg;
           break;
 
         case 'x':
@@ -434,35 +425,6 @@ main (argc, argv)
       ucuusage ();
     }
 
-  iuuconf = uuconf_init (&puuconf, "cu", zconfig);
-  if (iuuconf != UUCONF_SUCCESS)
-    ulog_uuconf (LOG_FATAL, puuconf, iuuconf);
-  pCuuuconf = puuconf;
-
-#if DEBUG > 1
-  {
-    const char *zdebug;
-
-    iuuconf = uuconf_debuglevel (puuconf, &zdebug);
-    if (iuuconf != UUCONF_SUCCESS)
-      ulog_uuconf (LOG_FATAL, puuconf, iuuconf);
-    if (zdebug != NULL)
-      iDebug |= idebug_parse (zdebug);
-  }
-#endif
-
-  usysdep_initialize (puuconf, INIT_NOCHDIR | INIT_SUID);
-
-  iuuconf = uuconf_localname (puuconf, &zlocalname);
-  if (iuuconf == UUCONF_NOT_FOUND)
-    {
-      zlocalname = zsysdep_localname ();
-      if (zlocalname == NULL)
-        exit (EXIT_FAILURE);
-    }
-  else if (iuuconf != UUCONF_SUCCESS)
-    ulog_uuconf (LOG_FATAL, puuconf, iuuconf);
-
   ulog_fatal_fn (ucuabort);
   pfLstart = uculog_start;
   pfLend = uculog_end;
@@ -482,18 +444,6 @@ main (argc, argv)
 #ifdef SIGPIPE
   usysdep_signal (SIGPIPE);
 #endif
-
-  if (zsystem != NULL)
-    {
-      iuuconf = uuconf_system_info (puuconf, zsystem, &ssys);
-      if (iuuconf != UUCONF_SUCCESS)
-        {
-          if (iuuconf != UUCONF_NOT_FOUND)
-            ulog_uuconf (LOG_FATAL, puuconf, iuuconf);
-          ulog (LOG_FATAL, "%s: System not found", zsystem);
-        }
-      qsys = &ssys;
-    }
 
   /* This loop is used if a system is specified.  It loops over the
      various alternates until it finds one for which the dial
@@ -522,119 +472,13 @@ main (argc, argv)
       sinfo.fdirect = qsys == NULL;
       sinfo.qconn = &sconn;
       sinfo.zline = zline;
-      if (zport != NULL || zline != NULL || ibaud != 0L)
+      if (zline != NULL || ibaud != 0L)
         {
-          iuuconf = uuconf_find_port (puuconf, zport, ibaud, 0L,
-                                      icuport_lock, (pointer) &sinfo,
-                                      &sport);
-          if (iuuconf != UUCONF_SUCCESS)
-            {
-              if (iuuconf != UUCONF_NOT_FOUND)
-                {
-                  if (sinfo.flocked)
-                    {
-                      (void) fconn_unlock (&sconn);
-                      uconn_free (&sconn);
-                    }
-                  ulog_uuconf (LOG_FATAL, puuconf, iuuconf);
-                }
-              if (zline == NULL
-                  || zport != NULL
-                  || qsys != NULL)
-                {
-                  if (sinfo.fmatched)
-                    ulog (LOG_FATAL, "All matching ports in use");
-                  else
-                    ulog (LOG_FATAL, "No matching ports");
-                }
-
-              sport.uuconf_zname = zline;
-              sport.uuconf_ttype = UUCONF_PORTTYPE_DIRECT;
-              sport.uuconf_zprotocols = NULL;
-              sport.uuconf_qproto_params = NULL;
-              sport.uuconf_ireliable = 0;
-              sport.uuconf_zlockname = NULL;
-              sport.uuconf_palloc = NULL;
-              sport.uuconf_u.uuconf_sdirect.uuconf_zdevice = NULL;
-              sport.uuconf_u.uuconf_sdirect.uuconf_ibaud = ibaud;
-
-              if (! fconn_init (&sport, &sconn, UUCONF_PORTTYPE_UNKNOWN))
-                ucuabort ();
-
-              if (! fconn_lock (&sconn, FALSE, TRUE))
-                ulog (LOG_FATAL, "%s: Line in use", zline);
-
-              qCuconn = &sconn;
-
-              /* Check user access after locking the port, because on
-                 some systems shared lines affect the ownership and
-                 permissions.  In such a case ``Line in use'' is more
-                 clear than ``Permission denied.''  */
-              if (! fsysdep_port_access (&sport))
-                ulog (LOG_FATAL, "%s: Permission denied", zline);
-            }
           iusebaud = ibaud;
           ihighbaud = 0L;
         }
       else
         {
-          for (; qsys != NULL; qsys = qsys->uuconf_qalternate)
-            {
-              if (! qsys->uuconf_fcall)
-                continue;
-              if (qsys->uuconf_qport != NULL)
-                {
-                  if (fconn_init (qsys->uuconf_qport, &sconn,
-                                  UUCONF_PORTTYPE_UNKNOWN))
-                    {
-                      if (fconn_lock (&sconn, FALSE, FALSE))
-                        {
-                          qCuconn = &sconn;
-                          break;
-                        }
-                      uconn_free (&sconn);
-                    }
-                }
-              else
-                {
-                  sinfo.fmatched = FALSE;
-                  sinfo.flocked = FALSE;
-                  sinfo.qconn = &sconn;
-                  iuuconf = uuconf_find_port (puuconf, qsys->uuconf_zport,
-                                              qsys->uuconf_ibaud,
-                                              qsys->uuconf_ihighbaud,
-                                              icuport_lock,
-                                              (pointer) &sinfo,
-                                              &sport);
-                  if (iuuconf == UUCONF_SUCCESS)
-                    break;
-                  if (iuuconf != UUCONF_NOT_FOUND)
-                    {
-                      if (sinfo.flocked)
-                        {
-                          (void) fconn_unlock (&sconn);
-                          uconn_free (&sconn);
-                        }
-                      ulog_uuconf (LOG_FATAL, puuconf, iuuconf);
-                    }
-                }
-            }
-
-          if (qsys == NULL)
-            {
-              const char *zrem;
-
-              if (flooped)
-                zrem = "remaining ";
-              else
-                zrem = "";
-              if (sinfo.fmatched)
-                ulog (LOG_FATAL, "%s: All %smatching ports in use",
-                      zsystem, zrem);
-              else
-                ulog (LOG_FATAL, "%s: No %smatching ports", zsystem, zrem);
-            }
-
           iusebaud = qsys->uuconf_ibaud;
           ihighbaud = qsys->uuconf_ihighbaud;
         }
@@ -764,7 +608,6 @@ ucuhelp ()
   printf (" -t,--mapcr: Map carriage return to carriage return/linefeed\n");
   printf (" -d: Set maximum debugging level\n");
   printf (" -x,--debug debug: Set debugging type\n");
-  printf (" -I,--config file: Set configuration file to use\n");
   printf (" -v,--version: Print version and exit\n");
   printf (" --help: Print help and exit\n");
   printf ("Report bugs to taylor-uucp@gnu.org\n");
