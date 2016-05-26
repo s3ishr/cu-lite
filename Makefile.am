@@ -1,7 +1,7 @@
 # This is the auto-Makefile for Taylor UUCP
 # This is processed by automake to create Makefile.in.
 
-SUBDIRS = lib uuconf unix
+SUBDIRS = lib uuconf unix test
 
 bin_PROGRAMS = cu
 info_TEXINFOS = uucp.texi
