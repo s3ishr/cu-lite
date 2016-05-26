@@ -54,10 +54,6 @@ fconn_init (qport, qconn, ttype)
       return fsysdep_modem_init (qconn);
     case UUCONF_PORTTYPE_DIRECT:
       return fsysdep_direct_init (qconn);
-#if HAVE_TCP
-    case UUCONF_PORTTYPE_TCP:
-      return fsysdep_tcp_init (qconn);
-#endif
     case UUCONF_PORTTYPE_PIPE:
       return fsysdep_pipe_init (qconn);
     default:

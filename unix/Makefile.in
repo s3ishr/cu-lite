@@ -123,7 +123,7 @@ am_libunix_a_OBJECTS = access.$(OBJEXT) addbas.$(OBJEXT) \
 	serial.$(OBJEXT) signal.$(OBJEXT) sindir.$(OBJEXT) \
 	size.$(OBJEXT) sleep.$(OBJEXT) spawn.$(OBJEXT) \
 	splcmd.$(OBJEXT) splnam.$(OBJEXT) spool.$(OBJEXT) \
-	srmdir.$(OBJEXT) status.$(OBJEXT) sync.$(OBJEXT) tcp.$(OBJEXT) \
+	srmdir.$(OBJEXT) status.$(OBJEXT) sync.$(OBJEXT) \
 	time.$(OBJEXT) tmpfil.$(OBJEXT) trunc.$(OBJEXT) \
 	uacces.$(OBJEXT) ufopen.$(OBJEXT) uid.$(OBJEXT) \
 	ultspl.$(OBJEXT) umode.$(OBJEXT) unknwn.$(OBJEXT) \
@@ -291,7 +291,7 @@ libunix_a_SOURCES = access.c addbas.c app3.c app4.c basnam.c bytfre.c \
 	loctim.c mkdirs.c mode.c move.c opensr.c pause.c \
 	pipe.c portnm.c priv.c proctm.c recep.c run.c seq.c \
 	serial.c signal.c sindir.c size.c sleep.c spawn.c splcmd.c \
-	splnam.c spool.c srmdir.c status.c sync.c tcp.c \
+	splnam.c spool.c srmdir.c status.c sync.c \
 	time.c tmpfil.c trunc.c uacces.c ufopen.c uid.c ultspl.c \
 	umode.c unknwn.c walk.c wldcrd.c work.c \
 	fsusg.h
@@ -412,7 +412,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/status.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strerr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sync.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/time.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tmpfil.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/trunc.Po@am__quote@

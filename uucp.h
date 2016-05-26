@@ -246,10 +246,6 @@ extern char *getenv ();
 extern int errno;
 #endif
 
-/* If the system has the socket call, guess that we can compile the
-   TCP code.  */
-#define HAVE_TCP HAVE_SOCKET
-
 /* The boolean type holds boolean values.  */
 typedef int boolean;
 #undef TRUE
