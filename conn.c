@@ -386,16 +386,6 @@ fconn_carrier (qconn, fcarrier)
   return (*pfcarrier) (qconn, fcarrier);
 }
 
-/* Run a chat program on a connection.  */
-
-boolean
-fconn_run_chat (qconn, pzprog)
-     struct sconnection *qconn;
-     char **pzprog;
-{
-  return (*qconn->qcmds->pfchat) (qconn, pzprog);
-}
-
 /* Get the baud rate of a connection.  */
 
 long
@@ -493,16 +483,6 @@ fconn_dial_sequence (qconn, puuconf, pzdialer, qsys, zphone, qdialer,
           ftranslate = TRUE;
         }
 
-      if (! fchat (qconn, puuconf, &q->uuconf_schat, qsys, q, ztoken,
-                   ftranslate, zname, iconn_baud (qconn)))
-        {
-          if (q == &s)
-            (void) uuconf_dialer_free (puuconf, q);
-          if (ffreefirst)
-            (void) uuconf_dialer_free (puuconf, qdialer);
-          return FALSE;
-        }
-
       if (ffirst)
         ffirst = FALSE;
       else
@@ -576,8 +556,6 @@ fmodem_dial (qconn, puuconf, qsys, zphone, qdialer, ptdialerfound)
         zname = qconn->qport->uuconf_zname;
 
       return (fsysdep_modem_begin_dial (qconn, q)
-              && fchat (qconn, puuconf, &q->uuconf_schat, qsys, q,
-                        zphone, FALSE, zname, iconn_baud (qconn))
               && fsysdep_modem_end_dial (qconn, q));
     }
   else

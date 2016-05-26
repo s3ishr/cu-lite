@@ -1356,12 +1356,6 @@ fsmodem_close (qconn, puuconf, qdialer, fsuccess)
 	}
       usunblocksigs (smask);
 
-      if (! fchat (qconn, puuconf, qchat, (const struct uuconf_system *) NULL,
-		   (const struct uuconf_dialer *) NULL, (const char *) NULL,
-		   FALSE, qconn->qport->uuconf_zname,
-		   qsysdep->ibaud))
-	fret = FALSE;
-
       /* Restore the old signal array and the SIGHUP handler.  It is
 	 not necessary to block signals here, since all we are doing
 	 is exactly what the signal handler itself would do if the
