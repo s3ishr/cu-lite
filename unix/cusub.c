@@ -128,7 +128,6 @@ zsport_line (qport)
       zline = qport->uuconf_u.uuconf_sdirect.uuconf_zdevice;
       break;
     case UUCONF_PORTTYPE_TCP:
-    case UUCONF_PORTTYPE_TLI:
     case UUCONF_PORTTYPE_PIPE:
       return NULL;
     }
@@ -616,7 +615,6 @@ uscu_child (qconn, opipe)
 	case UUCONF_PORTTYPE_MODEM:
 	case UUCONF_PORTTYPE_DIRECT:
 	case UUCONF_PORTTYPE_TCP:
-	case UUCONF_PORTTYPE_TLI:
 	  oport = ((struct ssysdep_conn *) qconn->psysdep)->o;
 	  break;
 	}
@@ -1078,7 +1076,6 @@ fsysdep_shell (qconn, zcmd, tcmd)
 	case UUCONF_PORTTYPE_MODEM:
 	case UUCONF_PORTTYPE_DIRECT:
 	case UUCONF_PORTTYPE_TCP:
-	case UUCONF_PORTTYPE_TLI:
 	  oread = owrite = ((struct ssysdep_conn *) qconn->psysdep)->o;
 	  break;
 	}

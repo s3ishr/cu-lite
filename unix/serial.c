@@ -45,16 +45,6 @@ const char serial_rcsid[] = "$Id: serial.c,v 1.78 2002/03/05 19:10:42 ian Rel $"
 #include <limits.h>
 #endif
 
-#if HAVE_TLI
-#if HAVE_TIUSER_H
-#include <tiuser.h>
-#else /* ! HAVE_TIUSER_H */
-#if HAVE_XTI_H
-#include <xti.h>
-#endif /* HAVE_XTI_H */
-#endif /* ! HAVE_TIUSER_H */
-#endif /* HAVE_TLI */
-
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #else
@@ -157,12 +147,6 @@ const char serial_rcsid[] = "$Id: serial.c,v 1.78 2002/03/05 19:10:42 ian Rel $"
 #ifdef TIOCEXCL
 #define HAVE_TIOCEXCL 1
 #endif
-#endif
-
-#if HAVE_TLI
-extern int t_errno;
-extern char *t_errlist[];
-extern int t_nerr;
 #endif
 
 /* These fields are defined on some systems, and I am told that it
@@ -2055,31 +2039,6 @@ fsysdep_conn_read (qconn, zbuf, pclen, cmin, ctimeout, freport)
 	  break;
 	}
 
-      /* Right here is the race condition which we avoid by having the
-	 SIGALRM handler schedule another SIGALRM.  */
-#if HAVE_TLI
-      if (q->ftli)
-	{
-	  int iflags;
-
-	  cgot = t_rcv (q->o, zbuf, cwant, &iflags);
-	  if (cgot < 0 && t_errno != TSYSERR)
-	    {
-	      usset_signal (SIGALRM, SIG_IGN, TRUE, (boolean *) NULL);
-	      alarm (0);
-	      usysdep_end_catch ();
-
-	      if (freport)
-		ulog (LOG_ERROR, "t_rcv: %s",
-		      (t_errno >= 0 && t_errno < t_nerr
-		       ? t_errlist[t_errno]
-		       : "unknown TLI error"));
-
-	      return FALSE;
-	    }
-	}
-      else
-#endif
 	cgot = read (q->o, zbuf, cwant);
 
       /* If the read returned an error, check for signals.  */
@@ -2222,21 +2181,6 @@ fsysdep_conn_write (qconn, zwrite, cwrite)
 	  if (FGOT_QUIT_SIGNAL ())
 	    return FALSE;
 
-#if HAVE_TLI
-	  if (q->ftli)
-	    {
-	      cdid = t_snd (q->o, (char *) zwrite, cwrite, 0);
-	      if (cdid < 0 && t_errno != TSYSERR)
-		{
-		  ulog (LOG_ERROR, "t_snd: %s",
-			(t_errno >= 0 && t_errno < t_nerr
-			 ? t_errlist[t_errno]
-			 : "unknown TLI error"));
-		  return FALSE;
-		}
-	    }
-	  else
-#endif
 	    cdid = write (q->o, zwrite, cwrite);
 
 	  if (cdid >= 0)
@@ -2401,28 +2345,6 @@ fsysdep_conn_io (qconn, zwrite, pcwrite, zread, pcread)
 	  if (FGOT_QUIT_SIGNAL ())
 	    return FALSE;
 
-#if HAVE_TLI
-	  if (q->ftli)
-	    {
-	      int iflags;
-
-	      cgot = t_rcv (q->o, zread, cread, &iflags);
-	      if (cgot < 0)
-		{
-		  if (t_errno == TNODATA)
-		    errno = EAGAIN;
-		  else if (t_errno != TSYSERR)
-		    {
-		      ulog (LOG_ERROR, "t_rcv: %s",
-			    (t_errno >= 0 && t_errno < t_nerr
-			     ? t_errlist[t_errno]
-			     : "unknown TLI error"));
-		      return FALSE;
-		    }
-		}
-	    }
-	  else
-#endif
 	    cgot = read (q->o, zread, cread);
 
 	  if (cgot >= 0)
@@ -2471,26 +2393,6 @@ fsysdep_conn_io (qconn, zwrite, pcwrite, zread, pcread)
 	  if (FGOT_QUIT_SIGNAL ())
 	    return FALSE;
 
-#if HAVE_TLI
-	  if (q->ftli)
-	    {
-	      cdid = t_snd (q->o, (char *) zwrite, cdo, 0);
-	      if (cdid < 0)
-		{
-		  if (t_errno == TFLOW)
-		    errno = EAGAIN;
-		  else if (t_errno != TSYSERR)
-		    {
-		      ulog (LOG_ERROR, "t_snd: %s",
-			    (t_errno >= 0 && t_errno < t_nerr
-			     ? t_errlist[t_errno]
-			     : "unknown TLI error"));
-		      return FALSE;
-		    }
-		}
-	    }
-	  else
-#endif
 	    cdid = write (q->o, zwrite, cdo);
 
 	  if (cdid >= 0)
@@ -2653,23 +2555,6 @@ fsysdep_conn_io (qconn, zwrite, pcwrite, zread, pcread)
                  system, we could get the alarm before we start the
                  write call.  This would not be a disaster; often the
                  write will succeed anyhow.  */
-#if HAVE_TLI
-	      if (q->ftli)
-		{
-		  cdid = t_snd (q->o, (char *) zwrite, 1, 0);
-		  if (cdid < 0 && t_errno != TSYSERR)
-		    {
-		      usset_signal (SIGALRM, SIG_IGN, TRUE, (boolean *) NULL);
-		      alarm (0);
-		      ulog (LOG_ERROR, "t_snd: %s",
-			    (t_errno >= 0 && t_errno < t_nerr
-			     ? t_errlist[t_errno]
-			     : "unknown TLI error"));
-		      return FALSE;
-		    }
-		}
-	      else
-#endif
 		cdid = write (q->o, zwrite, 1);
 
 	      ierr = errno;

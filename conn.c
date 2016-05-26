@@ -58,10 +58,6 @@ fconn_init (qport, qconn, ttype)
     case UUCONF_PORTTYPE_TCP:
       return fsysdep_tcp_init (qconn);
 #endif
-#if HAVE_TLI
-    case UUCONF_PORTTYPE_TLI:
-      return fsysdep_tli_init (qconn);
-#endif
     case UUCONF_PORTTYPE_PIPE:
       return fsysdep_pipe_init (qconn);
     default:
