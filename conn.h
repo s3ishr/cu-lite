@@ -207,16 +207,6 @@ extern boolean fconn_close P((struct sconnection *qconn,
                               struct uuconf_dialer *qdialer,
                               boolean fsuccess));
 
-/* Dial out on a connection.  The qsys and zphone arguments are for
-   the chat scripts; zphone is the phone number to dial.  If qdialer
-   is not NULL, *qdialer will be set to the dialer information used if
-   any; *ptdialerfound will be set appropriately.  */
-extern boolean fconn_dial P((struct sconnection *q, pointer puuconf,
-                             const struct uuconf_system *qsys,
-                             const char *zphone,
-                             struct uuconf_dialer *qdialer,
-                             enum tdialerfound *ptdialerfound));
-
 /* Read from a connection.
    zbuf -- buffer to read bytes into
    *pclen on call -- length of zbuf
@@ -267,23 +257,6 @@ extern long iconn_baud P((struct sconnection *qconn));
    when \M is encountered.  */
 extern boolean fconn_carrier P((struct sconnection *qconn,
                                 boolean fcarrier));
-
-/* Run through a dialer sequence.  This is a support routine for the
-   port type specific dialing routines.  */
-extern boolean fconn_dial_sequence P((struct sconnection *qconn,
-                                      pointer puuconf, char **pzdialer,
-                                      const struct uuconf_system *qsys,
-                                      const char *zphone,
-                                      struct uuconf_dialer *qdialer,
-                                      enum tdialerfound *ptdialerfound));
-
-/* Dialing out on a modem is partially system independent.  This is
-   the modem dialing routine.  */
-extern boolean fmodem_dial P((struct sconnection *qconn, pointer puuconf,
-                              const struct uuconf_system *qsys,
-                              const char *zphone,
-                              struct uuconf_dialer *qdialer,
-                              enum tdialerfound *ptdialerfound));
 
 /* Begin dialing out.  This should open the dialer device if there is
    one, toggle DTR if requested and possible, and tell the port to

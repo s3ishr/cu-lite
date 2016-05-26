@@ -635,12 +635,6 @@ ftcp_dial (qconn, puuconf, qsys, zphone, qdialer, ptdialer)
 
   /* Handle the dialer sequence, if any.  */
   pzdialer = qconn->qport->uuconf_u.uuconf_stcp.uuconf_pzdialer;
-  if (pzdialer != NULL && *pzdialer != NULL)
-    {
-      if (! fconn_dial_sequence (qconn, puuconf, pzdialer, qsys, zphone,
-				 qdialer, ptdialer))
-	return FALSE;
-    }
 
   return TRUE;
 }

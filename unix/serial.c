@@ -270,7 +270,6 @@ static const struct sconncmds smodemcmds =
   fsserial_unlock,
   fsmodem_open,
   fsmodem_close,
-  fmodem_dial,
   fsysdep_conn_read,
   fsysdep_conn_write,
   fsysdep_conn_io,

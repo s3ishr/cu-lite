@@ -159,9 +159,6 @@ static struct sconnection *qCuconn;
 /* Whether to close the connection.  */
 static boolean fCuclose_conn;
 
-/* Dialer used to dial out.  */
-static struct uuconf_dialer *qCudialer;
-
 /* Whether we need to restore the terminal.  */
 static boolean fCurestore_terminal;
 
@@ -212,11 +209,9 @@ static boolean fcusend_buf P((struct sconnection *qconn, const char *zbuf,
 /* Long getopt options.  */
 static const struct option asCulongopts[] =
 {
-  { "phone", required_argument, NULL, 'c' },
   { "escape", required_argument, NULL, 'E' },
   { "parity", required_argument, NULL, 2 },
   { "halfduplex", no_argument, NULL, 'h' },
-  { "prompt", no_argument, NULL, 'n' },
   { "line", required_argument, NULL, 'l' },
   { "port", required_argument, NULL, 'p' },
   { "speed", required_argument, NULL, 's' },
@@ -236,14 +231,10 @@ main (argc, argv)
      int argc;
      char **argv;
 {
-  /* -c: phone number.  */
-  char *zphone = NULL;
   /* -e: even parity.  */
   boolean feven = FALSE;
   /* -l: line.  */
   char *zline = NULL;
-  /* -n: prompt for phone number.  */
-  boolean fprompt = FALSE;
   /* -o: odd parity.  */
   boolean fodd = FALSE;
   /* -p: port name.  */
@@ -270,8 +261,6 @@ main (argc, argv)
   struct sconnection sconn;
   struct sconninfo sinfo;
   long ihighbaud;
-  struct uuconf_dialer sdialer;
-  struct uuconf_dialer *qdialer;
   char bcmd;
 
   zProgram = argv[0];
@@ -300,11 +289,6 @@ main (argc, argv)
     {
       switch (iopt)
         {
-        case 'c':
-          /* Phone number.  */
-          zphone = optarg;
-          break;
-
         case 'd':
           /* Set debugging level to maximum.  */
 #if DEBUG > 1
@@ -325,11 +309,6 @@ main (argc, argv)
         case 'h':
           /* Local echo.  */
           fCulocalecho = TRUE;
-          break;
-
-        case 'n':
-          /* Prompt for phone number.  */
-          fprompt = TRUE;
           break;
 
         case 'l':
@@ -432,18 +411,14 @@ main (argc, argv)
   if (optind != argc)
     {
       if (optind != argc - 1
-          || zsystem != NULL
-          || zphone != NULL)
+          || zsystem != NULL)
         {
           fprintf (stderr, "%s: too many arguments\n", zProgram);
           ucuusage ();
         }
       if (strcmp (argv[optind], "dir") != 0)
         {
-          if (isdigit (BUCHAR (argv[optind][0])))
-            zphone = argv[optind];
-          else
-            zsystem = argv[optind];
+          zsystem = argv[optind];
         }
     }
 
@@ -457,22 +432,6 @@ main (argc, argv)
       fprintf (stderr, "%s: must specify system, line, port or speed\n",
                zProgram);
       ucuusage ();
-    }
-
-  if (fprompt)
-    {
-      size_t cphone;
-
-      printf ("Phone number: ");
-      (void) fflush (stdout);
-      zphone = NULL;
-      cphone = 0;
-      if (getline (&zphone, &cphone, stdin) <= 0
-          || *zphone == '\0')
-        {
-          fprintf (stderr, "%s: no phone number entered\n", zProgram);
-          exit (EXIT_FAILURE);
-        }
     }
 
   iuuconf = uuconf_init (&puuconf, "cu", zconfig);
@@ -560,7 +519,7 @@ main (argc, argv)
          have read and write access to the port.  */
       sinfo.fmatched = FALSE;
       sinfo.flocked = FALSE;
-      sinfo.fdirect = qsys == NULL && zphone == NULL;
+      sinfo.fdirect = qsys == NULL;
       sinfo.qconn = &sconn;
       sinfo.zline = zline;
       if (zport != NULL || zline != NULL || ibaud != 0L)
@@ -581,7 +540,6 @@ main (argc, argv)
                 }
               if (zline == NULL
                   || zport != NULL
-                  || zphone != NULL
                   || qsys != NULL)
                 {
                   if (sinfo.fmatched)
@@ -715,59 +673,18 @@ main (argc, argv)
       if (! fconn_set (&sconn, tparity, tstrip, txonxoff))
         ucuabort ();
 
-      if (qsys != NULL)
-        zphone = qsys->uuconf_zphone;
-
-      if (qsys != NULL || zphone != NULL)
-        {
-          enum tdialerfound tdialer;
-
-          if (! fconn_dial (&sconn, puuconf, qsys, zphone, &sdialer,
-                            &tdialer))
-            {
-              if (zport != NULL
-                  || zline != NULL
-                  || ibaud != 0L
-                  || qsys == NULL)
-                ucuabort ();
-
-              qsys = qsys->uuconf_qalternate;
-              if (qsys == NULL)
-                ulog (LOG_FATAL, "%s: No remaining alternates", zsystem);
-
-              fCuclose_conn = FALSE;
-              (void) fconn_close (&sconn, pCuuuconf, qCudialer, FALSE);
-              qCuconn = NULL;
-              (void) fconn_unlock (&sconn);
-              uconn_free (&sconn);
-
-              /* Loop around and try another alternate.  */
-              flooped = TRUE;
-              continue;
-            }
-          if (tdialer == DIALERFOUND_FALSE)
-            qdialer = NULL;
-          else
-            qdialer = &sdialer;
-        }
-      else
-        {
-          /* If no system or phone number was specified, we connect
-             directly to the modem.  We only permit this if the user
-             has access to the port, since it permits various
-             shenanigans such as reprogramming the automatic
-             callbacks.  */
-          if (! fsysdep_port_access (sconn.qport))
-            ulog (LOG_FATAL, "Access to port denied");
-          qdialer = NULL;
-          if (! fconn_carrier (&sconn, FALSE))
-            ulog (LOG_FATAL, "Can't turn off carrier");
-        }
+      /* If no system or phone number was specified, we connect
+         directly to the modem.  We only permit this if the user
+         has access to the port, since it permits various
+         shenanigans such as reprogramming the automatic
+         callbacks.  */
+      if (! fsysdep_port_access (sconn.qport))
+        ulog (LOG_FATAL, "Access to port denied");
+      if (! fconn_carrier (&sconn, FALSE))
+        ulog (LOG_FATAL, "Can't turn off carrier");
 
       break;
     }
-
-  qCudialer = qdialer;
 
   if (FGOT_SIGNAL ())
     ucuabort ();
@@ -800,7 +717,7 @@ main (argc, argv)
   fCurestore_terminal = FALSE;
   (void) fsysdep_terminal_restore ();
 
-  (void) fconn_close (&sconn, puuconf, qdialer, TRUE);
+  (void) fconn_close (&sconn, puuconf, NULL, TRUE);
   (void) fconn_unlock (&sconn);
   uconn_free (&sconn);
 
@@ -820,7 +737,7 @@ main (argc, argv)
 static void
 ucuusage ()
 {
-  fprintf (stderr, "Usage: %s [options] [system or phone-number]\n",
+  fprintf (stderr, "Usage: %s [options] [system]\n",
            zProgram);
   fprintf (stderr, "Use %s --help for help\n", zProgram);
   exit (EXIT_FAILURE);
@@ -833,11 +750,10 @@ ucuhelp ()
 {
   printf ("Taylor UUCP %s, copyright (C) 1991, 92, 93, 94, 1995, 2002 Ian Lance Taylor\n",
           VERSION);
-  printf ("Usage: %s [options] [system or phone-number]\n", zProgram);
+  printf ("Usage: %s [options] [system]\n", zProgram);
   printf (" -a,-p,--port port: Use named port\n");
   printf (" -l,--line line: Use named device (e.g. tty0)\n");
   printf (" -s,--speed,--baud speed, -#: Use given speed\n");
-  printf (" -c,--phone phone: Phone number to call\n");
   printf (" -z,--system system: System to call\n");
   printf (" -e: Set even parity\n");
   printf (" -o: Set odd parity\n");
@@ -846,7 +762,6 @@ ucuhelp ()
   printf (" -h,--halfduplex: Echo locally\n");
   printf (" --nostop: Turn off XON/XOFF handling\n");
   printf (" -t,--mapcr: Map carriage return to carriage return/linefeed\n");
-  printf (" -n,--prompt: Prompt for phone number\n");
   printf (" -d: Set maximum debugging level\n");
   printf (" -x,--debug debug: Set debugging type\n");
   printf (" -I,--config file: Set configuration file to use\n");
@@ -879,7 +794,7 @@ ucuabort ()
       if (fCuclose_conn)
         {
           fCuclose_conn = FALSE;
-          (void) fconn_close (qCuconn, pCuuuconf, qCudialer, FALSE);
+          (void) fconn_close (qCuconn, pCuuuconf, NULL, FALSE);
         }
       qconn = qCuconn;
       qCuconn = NULL;
